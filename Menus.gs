@@ -62,7 +62,7 @@ function menuNewGame()
 
 function menuPlay() 
 {
-  var ui = SpreadsheetApp.getUi();
+  // var ui = SpreadsheetApp.getUi();
   var spreadsheet = SpreadsheetApp.getActive();
   var sheet = spreadsheet.getActiveSheet()
   var sheetName = sheet.getSheetName()
@@ -86,26 +86,26 @@ function menuPlay()
     gameState.game.activeColumn = result.getResponseText();
     description = getDescription(gameState,sheet)
   }
-  var result = ui.prompt(
-      description,
-      'Please enter your response:',
-      ui.ButtonSet.OK_CANCEL);
-  // Process the user's response.
-  var button = result.getSelectedButton();
-  var text = result.getResponseText();
-  if (button == ui.Button.OK && text.length > 0) {
+  // var result = ui.prompt(
+  //     description,
+  //     'Please enter your response:',
+  //     ui.ButtonSet.OK_CANCEL);
+  // // Process the user's response.
+  // var button = result.getSelectedButton();
+  // var text = result.getResponseText();
+  // if (button == ui.Button.OK && text.length > 0) {
     // User clicked "OK"
-    // var text = "My name is Axzle and I'm from The Last City: A post-apocalyptic game where you navigate the ruins of a once-great metropolis and struggle to survive in a world ruled by chaos and destruction."
+    var text = "TALK TO THE VOICE"
     Logger.log("User Input: " + text)
-    gameState.prompt = text
+    gameState.game.prompt = text
     gameState = narratorAI(text, gameState, sheet)
     postGameState(gameState,sheet)
     menuPlay();
-  } else if (button == ui.Button.CANCEL) {
-    // User clicked "Cancel".
-    ui.alert("That's okay we can continue later. Don't forget to have an adventure in the real world.");
-  } else if (button == ui.Button.CLOSE) {
-    // User clicked X in the title bar.
-    ui.alert('You closed the dialog. Feel free to explore your timeline! ⏳');
-  }
+  // } else if (button == ui.Button.CANCEL) {
+  //   // User clicked "Cancel".
+  //   ui.alert("That's okay we can continue later. Don't forget to have an adventure in the real world.");
+  // } else if (button == ui.Button.CLOSE) {
+  //   // User clicked X in the title bar.
+  //   ui.alert('You closed the dialog. Feel free to explore your timeline! ⏳');
+  // }
 }
