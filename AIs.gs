@@ -116,12 +116,18 @@ function designerAI(prompt,gameState,sheet,rowImage,rowDescription)
 
 function assistAI(gameState,sheet)
 {
+  var spreadsheet = SpreadsheetApp.getActive();
+    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("Shadows of the Mind"), true);
+    sheet = spreadsheet.getSheetByName("Shadows of the Mind")
+  gameState = getGameState(sheet)
   const assistant = []
   assistant.push({"role":"system","content":"You are an assistant bot for a text-based RPG narrator in " +gameState.game.name+". Your job is to take a conversation thread from the narrator and user to provide some possible ideas. Don't give too much detail on what will happen. Lean into the narrative story and setting."}
                   ,{"role": "user", "content": "Load my story so far."}
                   ,{"role": "assistant", "content": gameState.game.summary}
                   ,{"role": "user", "content": "Load my current scene."}
                   ,{"role": "assistant", "content": gameState.game.scene}
+                  ,{"role": "user", "content": "Load my current mechanic."}
+                  ,{"role": "assistant", "content": gameState.game.mechanic}
                   ,{"role": "user", "content": "I'm asking you for suggestions on what I can do next. Maybe 2 somewhat obvious and 2 really creative options Have the options be related to the character, story and specific scene."})
   Logger.log("AssistAI")
   var suggestion = sendPrompt(assistant,1.2,.4)
@@ -147,8 +153,8 @@ function timelineAI(gameState,sheet)
   timeline.push.apply(timeline,gameState.game.story)
   timeline.push({"role": "user", "content": "Please provide a short summary of my story so far. Capturing the world, characters, and plot."})
   Logger.log("TimelineAI")
-  gameState.summary = sendPrompt(timeline,1.2,.4)
-  timeline.push({"role": "assistant", "content": gameState.summary})
+  gameState.game.summary = sendPrompt(timeline,1.2,.4)
+  timeline.push({"role": "assistant", "content": gameState.game.summary})
   // set the gameState.game.story equal to the timeline array minus the first two elements
   gameState.game.story = timeline.slice(2)
   postGameState(gameState,sheet)
