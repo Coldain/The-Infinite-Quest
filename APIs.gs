@@ -143,6 +143,7 @@ function sendDescription(prompt)
       case 403: // Security permissions prevent access to data
           throw new Error ("Security permissions prevent access to data:\n" + response.getContentText())
       default: // unhandled status
+        Logger.log(response.getContentText())
         throw new Error (response.getContentText())
     }
   }

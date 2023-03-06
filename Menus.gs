@@ -16,10 +16,10 @@ function menuSuggestions()
   if (sheetName == "Instructions" || sheetName == "New Game")
   {  
     // Insert UI to select from sheets
-    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("Micro Man"), true);
-    sheet = spreadsheet.getSheetByName("Micro Man")
+    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("The Last City"), true);
+    sheet = spreadsheet.getSheetByName("The Last City")
   }
-  Logger.log(spreadsheet.getActiveSheet().getSheetName())
+  Logger.log("Current Game: " + spreadsheet.getActiveSheet().getSheetName())
   var gameState = getGameState(sheet)
   assistAI(gameState,sheet)
   
@@ -56,7 +56,7 @@ function menuNewGame()
   spreadsheet.getSheetByName('New Game').hideSheet()
   spreadsheet.getSheetByName(text).showSheet()
   spreadsheet.setActiveSheet(spreadsheet.getSheetByName(text), true);
-  postGameState(intialSetting(),sheet)
+  postGameState(intialSetting(text),sheet)
   menuPlay()
 }
 
@@ -69,14 +69,14 @@ function menuPlay()
   if (sheetName == "Instructions" || sheetName == "New Game")
   {  
     // Insert UI to select from sheets
-    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("Cartoon World"), true);
-    sheet = spreadsheet.getSheetByName("Cartoon World")
+    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("The Last City"), true);
+    sheet = spreadsheet.getSheetByName("The Last City")
   }
-  Logger.log(spreadsheet.getActiveSheet().getSheetName())
+  Logger.log("Current Game: " + spreadsheet.getActiveSheet().getSheetName())
   var gameState = getGameState(sheet)
-
+  Logger.log({gameState})
   var description = getDescription(gameState,sheet)
-  Logger.log(description)
+  Logger.log("Current Scene: " + description)
 
   if(description == "")
   {
@@ -94,8 +94,10 @@ function menuPlay()
   var button = result.getSelectedButton();
   var text = result.getResponseText();
   if (button == ui.Button.OK && text.length > 0) {
-    // var text = "My name is Spot, Cool Spot. I'm the mascot for 7-Up soda. I like to slip into a cartoon world and hang out with Chester Cheeto and Freakazoid as we go on zany adventures."
     // User clicked "OK"
+    // var text = "My name is Axzle and I'm from The Last City: A post-apocalyptic game where you navigate the ruins of a once-great metropolis and struggle to survive in a world ruled by chaos and destruction."
+    Logger.log("User Input: " + text)
+    gameState.prompt = text
     gameState = narratorAI(text, gameState, sheet)
     postGameState(gameState,sheet)
     menuPlay();

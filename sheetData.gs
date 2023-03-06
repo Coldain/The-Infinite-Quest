@@ -30,13 +30,21 @@ function getRowMechanic()
 {
   return 9
 }
-function getRowSummary()
+function getRowPlot()
 {
   return 10
 }
-function getRowStory()
+function getRowInventory()
 {
   return 11
+}
+function getRowSummary()
+{
+  return 12
+}
+function getRowGame()
+{
+  return 13
 }
 
 
@@ -123,6 +131,14 @@ function postImagery(prompt,gameState,sheet)
 function postMechanics(prompt,gameState,sheet)
 {
   sheet.getRange(getRowMechanic(),gameState.game.activeColumn).setValue(prompt)
+}
+function postPlot(prompt,gameState,sheet)
+{
+  sheet.getRange(getRowPlot(),gameState.game.activeColumn).setValue(prompt)
+}
+function postInventory(prompt,gameState,sheet)
+{
+  sheet.getRange(getRowInventory(),gameState.game.activeColumn).setValue(prompt)
 }
 function postSummary(prompt,gameState,sheet)
 {
