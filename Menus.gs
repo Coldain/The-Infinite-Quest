@@ -96,7 +96,7 @@ function menuPlay()
   if (button == ui.Button.OK && text.length > 0) {
     // var text = "My name is Spot, Cool Spot. I'm the mascot for 7-Up soda. I like to slip into a cartoon world and hang out with Chester Cheeto and Freakazoid as we go on zany adventures."
     // User clicked "OK"
-    gameState = mechanicsAI(text, gameState, sheet)
+    gameState = narratorAI(text, gameState, sheet)
     postGameState(gameState,sheet)
     menuPlay();
   } else if (button == ui.Button.CANCEL) {

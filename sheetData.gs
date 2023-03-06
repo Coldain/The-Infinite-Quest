@@ -1,3 +1,45 @@
+function getRowSceneImage()
+{
+  return 2
+}
+function getRowScene()
+{
+  return 3
+}
+function getRowPromptImage()
+{
+  return 4
+}
+function getRowPrompt()
+{
+  return 5
+}
+function getRowSuggestion()
+{
+  return 6
+}
+function getRowSceneImagery()
+{
+  return 7
+}
+function getRowPromptImagery()
+{
+  return 8
+}
+function getRowMechanic()
+{
+  return 9
+}
+function getRowSummary()
+{
+  return 10
+}
+function getRowStory()
+{
+  return 11
+}
+
+
 function downloadFile(imageURL) {  
   var fileName = "";
   var fileSize = 0;
@@ -57,22 +99,34 @@ function loadSheet() {
 
 function getDescription(gameState,sheet)
 {
-  return sheet.getRange(3,gameState.game.activeColumn).getValue()
+  return sheet.getRange(getRowScene(),gameState.game.activeColumn).getValue()
 }
 
 function postDescription(description,gameState,sheet)
 {
-  sheet.getRange(3,gameState.game.activeColumn).setValue(description)
+  sheet.getRange(getRowScene(),gameState.game.activeColumn).setValue(description)
   return gameState
 }
 
 function postPrompt(prompt,gameState,sheet)
 {
-  sheet.getRange(5,gameState.game.activeColumn).setValue(prompt)
+  sheet.getRange(getRowPrompt(),gameState.game.activeColumn).setValue(prompt)
 }
 function postSuggestion(prompt,gameState,sheet)
 {
-  sheet.getRange(6,gameState.game.activeColumn).setValue(prompt)
+  sheet.getRange(getRowSuggestion(),gameState.game.activeColumn).setValue(prompt)
+}
+function postImagery(prompt,gameState,sheet)
+{
+  sheet.getRange(getRowImagery(),gameState.game.activeColumn).setValue(prompt)
+}
+function postMechanics(prompt,gameState,sheet)
+{
+  sheet.getRange(getRowMechanic(),gameState.game.activeColumn).setValue(prompt)
+}
+function postSummary(prompt,gameState,sheet)
+{
+  sheet.getRange(getRowSummary(),gameState.game.activeColumn).setValue(prompt)
 }
 
 
