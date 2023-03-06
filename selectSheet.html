@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css" />
+  </head>
+  <body>
+    <select id="mySelect" onchange="selectChange(this)">
+    </select>
+    <a href="javascript: return false;" role="button" id="btnApply" onclick="submitForm();">Apply</a>
+    <script>
+      function selectChange(select) {
+        google.script.run.changeSheet(select.value);
+      }
+      function sheetNames(names) {
+        var select = document.getElementById("mySelect");
+        for( var i=0; i<names.length; i++ ) {
+          var option = document.createElement("option");
+          option.text = names[i];
+          select.add(option);
+        }
+      }
+      (function () { google.script.run.withSuccessHandler(sheetNames).getSheets(); }());
+    </script>
+  </body>
+</html>
