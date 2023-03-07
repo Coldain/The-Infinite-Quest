@@ -60,9 +60,13 @@ function menuNewGame()
   menuPlay()
 }
 
-function menuPlay() 
+function test()
 {
-  var testing = 1
+  menuPlay(1)
+}
+
+function menuPlay(testing) 
+{
   if(testing == 1){var ui = SpreadsheetApp.getUi();}
   var spreadsheet = SpreadsheetApp.getActive();
   var sheet = spreadsheet.getActiveSheet()
