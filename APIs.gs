@@ -35,7 +35,7 @@ function sendPrompt(prompt, chaos, frequency_penalty)
     payload.messages = prompt
     payload.n = 1
     payload.frequency_penalty = frequency_penalty
-    payload.max_tokens = 3000
+    // payload.max_tokens = 3000
                   
     payloadAsJson = JSON.stringify(payload);
 

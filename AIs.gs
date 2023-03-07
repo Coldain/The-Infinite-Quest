@@ -94,7 +94,7 @@ function designerAI(prompt,gameState,sheet,rowImage,rowDescription)
   designer.push({"role":"system","content":"You are video game designer in charge of creating art for a text-based rpg called " +gameState.game.name+". Your job is is to assist the narrator by creating prompts for AI created images. Try to keep the style consistent for the game. Don't let prompts fail because of censorship."}
     ,{"role": "user", "content": "Load my story timeline so far."}
     ,{"role": "assistant", "content": gameState.game.summary}
-    ,{"role": "user", "content": "Please create one description that can be used by AI (Dalle API) to generate an image. Destill the esences of the following scene into a single image. \nScene:" + prompt})
+    ,{"role": "user", "content": "Please create one description that can be used by AI (Dalle API) to generate an image. Destill the esences of the following scene into a single image and make it visually interesting. \nScene:" + prompt})
   Logger.log("DesignerAI")
   var description = sendPrompt(designer,.6,-.1)
   // var description = ""
