@@ -62,15 +62,16 @@ function menuNewGame()
 
 function menuPlay() 
 {
-  // var ui = SpreadsheetApp.getUi();
+  var testing = 1
+  if(testing == 1){var ui = SpreadsheetApp.getUi();}
   var spreadsheet = SpreadsheetApp.getActive();
   var sheet = spreadsheet.getActiveSheet()
   var sheetName = sheet.getSheetName()
   if (sheetName == "Instructions" || sheetName == "New Game")
   {  
     // Insert UI to select from sheets
-    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("The Last City"), true);
-    sheet = spreadsheet.getSheetByName("The Last City")
+    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("Shadows of the Mind"), true);
+    sheet = spreadsheet.getSheetByName("Shadows of the Mind")
   }
   Logger.log("Current Game: " + spreadsheet.getActiveSheet().getSheetName())
   var gameState = getGameState(sheet)
@@ -86,26 +87,38 @@ function menuPlay()
     gameState.game.activeColumn = result.getResponseText();
     description = getDescription(gameState,sheet)
   }
-  // var result = ui.prompt(
-  //     description,
-  //     'Please enter your response:',
-  //     ui.ButtonSet.OK_CANCEL);
-  // // Process the user's response.
-  // var button = result.getSelectedButton();
-  // var text = result.getResponseText();
-  // if (button == ui.Button.OK && text.length > 0) {
-    // User clicked "OK"
-    var text = "TALK TO THE VOICE"
+  if(testing == 1)
+  {
+    var text = "Use my imagination to illuminate create an orb of light that shines down upon the glowing stone on the pedestal. A cool mist begins to permeate the room. I approach and examine the stone."
     Logger.log("User Input: " + text)
     gameState.game.prompt = text
     gameState = narratorAI(text, gameState, sheet)
     postGameState(gameState,sheet)
-    menuPlay();
-  // } else if (button == ui.Button.CANCEL) {
-  //   // User clicked "Cancel".
-  //   ui.alert("That's okay we can continue later. Don't forget to have an adventure in the real world.");
-  // } else if (button == ui.Button.CLOSE) {
-  //   // User clicked X in the title bar.
-  //   ui.alert('You closed the dialog. Feel free to explore your timeline! ⏳');
-  // }
+  }
+  else
+  {
+    var result = ui.prompt(
+      description,
+      'Please enter your response:',
+      ui.ButtonSet.OK_CANCEL);
+    // Process the user's response.
+    var button = result.getSelectedButton();
+    var text = result.getResponseText();
+    if (button == ui.Button.OK && text.length > 0) 
+    {
+      // User clicked "OK"
+      // var text = "TALK TO THE VOICE"
+      Logger.log("User Input: " + text)
+      gameState.game.prompt = text
+      gameState = narratorAI(text, gameState, sheet)
+      postGameState(gameState,sheet)
+      menuPlay();
+    } else if (button == ui.Button.CANCEL) {
+      // User clicked "Cancel".
+      ui.alert("That's okay we can continue later. Don't forget to have an adventure in the real world.");
+    } else if (button == ui.Button.CLOSE) {
+      // User clicked X in the title bar.
+      ui.alert('You closed the dialog. Feel free to explore your timeline! ⏳');
+    }
+  }
 }

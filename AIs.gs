@@ -14,12 +14,12 @@ function narratorAI(prompt,gameState,sheet)
                 ,{"role": "assistant", "content": gameState.game.summary}
                 ,{"role": "user", "content": "Load my current scene."}
                 ,{"role": "assistant", "content": gameState.game.scene}
-                ,{"role": "user", "content":"Subsystem Input: " + gameState.mechanic + "\nUserInput: Here is what I'd like to do for the scene" + prompt + "\n Describe the next short scene in detail as if you were the narrator for a text-based RPG letting me choose my next actions and reactions for the scene."})
+                ,{"role": "user", "content":"Subsystem Input: " + gameState.game.mechanic + "\nUserInput: Here is what I'd like to do for the scene" + prompt + "\n Describe the next short scene in detail as if you were the narrator for a text-based RPG letting me choose my next actions and reactions for the scene."})
   // Send the prompt with the hidden mechanics information
   Logger.log("NarratorAI")
   var description = sendPrompt(narrator,1.2,.4)
   gameState.game.activeColumn++  
-  gameState.scene = description
+  gameState.game.scene = description
   postDescription(description,gameState,sheet)
   postGameState(gameState,sheet)
   return designerAI(description,gameState,sheet,getRowSceneImage(),getRowSceneImagery())
@@ -43,7 +43,7 @@ function mechanicsAI(prompt, gameState, sheet)
   Logger.log("mechanicsAI")
   var response = sendPrompt(mechanic,.7,-.2)
   postMechanics(response,gameState,sheet)
-  gameState.mechanic = response
+  gameState.game.mechanic = response
   return gameState
 }
 function plotAI(prompt, gameState, sheet)
@@ -60,7 +60,7 @@ function plotAI(prompt, gameState, sheet)
   Logger.log("plotAI")
   var response = sendPrompt(plot,.7,-.2)
   postPlot(response,gameState,sheet)
-  gameState.plot = response
+  gameState.game.plot = response
   return gameState
 }
 function inventoryAI(prompt, gameState, sheet)
@@ -77,7 +77,7 @@ function inventoryAI(prompt, gameState, sheet)
   Logger.log("InventoryAI")
   var response = sendPrompt(inventory,.7,-.2)
   postInventory(response,gameState,sheet)
-  gameState.inventory = response
+  gameState.game.inventory = response
   return gameState
 }
 
@@ -142,13 +142,11 @@ function timelineAI(gameState,sheet)
     const timeline = []
     timeline.push({"role":"system","content":"You are the timeline bot. Your job is to track and summarize the story so far in " +gameState.game.name+". You will be used to generate the timeline that the other bots will use to craft the next scene."}
                   ,{"role": "user", "content": "Please load in my story so far."})
-    timeline.push(gameState.game.story,{"role": "user", "content": "Please provide a short summary of my story so far. Capturing the world, characters, and plot."})
-    timeline.push({"role": "user", "content": "Load my story so far."}
-                  ,{"role": "assistant", "content": gameState.game.summary}
-                  ,{"role": "user", "content": "Load my current scene."}
-                  ,{"role": "assistant", "content": gameState.game.scene}
-                  ,{"role": "user", "content": "Load my current mechanic."}
-                  ,{"role": "assistant", "content": gameState.game.mechanic})
+  for (let i = 0; i < gameState.game.story.length; i++) 
+  {
+    timeline.push(gameState.game.story[0])
+  }
+    timeline.push({"role": "user", "content": "Please provide a short summary of my story so far. Capturing the world, characters, and plot."})
     // Replace gameState.game.story with the summary as an array with one element
   Logger.log("TimelineAI - Compression")
     gameState.game.story = [sendPrompt(timeline,1.2,.4)]
