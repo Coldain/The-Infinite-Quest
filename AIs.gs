@@ -144,9 +144,9 @@ function timelineAI(gameState,sheet)
                   ,{"role": "user", "content": "Please load in my story so far."})
   for (let i = 0; i < gameState.game.story.length; i++) 
   {
-    timeline.push(gameState.game.story[0])
+    timeline.push(gameState.game.story[i])
   }
-    timeline.push({"role": "user", "content": "Please provide a short summary of my story so far. Capturing the world, characters, and plot."})
+    timeline.push({"role": "user", "content": "Please provide a short timeline of my story events so far. Capturing the world, characters, and plot deelopment."})
     // Replace gameState.game.story with the summary as an array with one element
   Logger.log("TimelineAI - Compression")
     gameState.game.story = [sendPrompt(timeline,1.2,.4)]
@@ -156,11 +156,11 @@ function timelineAI(gameState,sheet)
                 ,{"role": "user", "content": "Please load in my story so far."})
   for (let i = 0; i < gameState.game.story.length; i++) 
   {
-    timeline.push(gameState.game.story[0])
+    timeline.push(gameState.game.story[i])
   }
   timeline.push({"role": "user", "content": "Load my current scene."}
                 ,{"role": "assistant", "content": gameState.game.scene}
-                ,{"role": "user", "content": "Please provide a short summary of my story so far. Capturing the world, characters, and plot."})
+                ,{"role": "user", "content": "Please provide a short timeline of my story events so far. Capturing the world, characters, and plot deelopment."})
   Logger.log("TimelineAI")
   gameState.game.summary = sendPrompt(timeline,1.2,.4)
   gameState.game.story.push({"role": "assistant", "content": gameState.game.summary})
