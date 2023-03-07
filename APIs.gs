@@ -4,9 +4,19 @@ function sendPrompt(prompt, chaos, frequency_penalty)
   try
   {
     // Get token details and baseUri from documentProperties, check to see if the URI needs to use old endpoint or not (depends on the API call and the region)
-    var documentProperties = PropertiesService.getDocumentProperties();
-    const token = documentProperties.getProperty("token")
-    const baseUri = documentProperties.getProperty("baseURI")
+    var userProperties = PropertiesService.getUserProperties();
+    var scriptProperties = PropertiesService.getScriptProperties();
+    var token = userProperties.getProperty("token")
+    if(token == null)
+    {
+      var ui = SpreadsheetApp.getUi();
+      var result = ui.prompt(
+          'Please enter your OpenAI API bearer token:',
+          ui.ButtonSet.OK_CANCEL);
+      token = result.getResponseText();
+      userProperties.setProperty("token",token)
+    } 
+    const baseUri = "https://api.openai.com/v1"
 
     // Test Data see at bottom
     //  payload = 
@@ -25,6 +35,7 @@ function sendPrompt(prompt, chaos, frequency_penalty)
     payload.messages = prompt
     payload.n = 1
     payload.frequency_penalty = frequency_penalty
+    payload.max_tokens = 3000
                   
     payloadAsJson = JSON.stringify(payload);
 
@@ -71,6 +82,12 @@ function sendPrompt(prompt, chaos, frequency_penalty)
             response = response.substring(0,response.indexOf("a a a")+1)
             Logger.log(response)
           }
+          if(response.includes("the player the player"))
+          {
+            response = response.substring(0,response.indexOf("the player the player")+10)
+            Logger.log(response)
+          }
+          
           return response
         }
       case 204: // No Content, nothing to process
@@ -163,26 +180,4 @@ function sendDescription(prompt)
     Logger.log(err.stack)
     throw new Error(err.message)
   }
-}
-
-function setAPICred()
-{ 
-    var documentProperties = PropertiesService.getDocumentProperties();
-    documentProperties.setProperties({
-      'token': "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",
-      'baseURI': "https://api.openai.com/v1"
-    }); 
-}
-
-
-function testTheThe()
-{
-  var response = "Great! Let's update the plot points and key characters based on the player's input and explore how to develop them:\n\nPlot Points:\n\n- Establishing the role and influence of The Voice: The Voice is a key character who serves as a guide to Consciousness. Talking to The Voice can help establish its knowledge and intentions towards helping Consciousness escape.\n\n- Understanding the nature of your inner demon: The distorted and ominous shadow in the mirror represents your inner demon. Talking to The Voice can provide insight on how to confront and defeat it.\n\n- Unlocking the door to the next room: The door in the room is locked, and the key provided to Consciousness may be the key to unlocking the door. Consciousness must find a way to unlock the door to progress to the next phase of the game.\n\nKey Characters:\n\n- The Voice: The Voice serves as the guide to Consciousness, and can provide insight and knowledge about the challenges and trials that Consciousness will face. The further the game progresses, the more the player and the character's trust could develop and the Voice's true nature can be revealed.\n\n- Inner Demon: The inner demon represents the darkest and most negative aspects of Consciousness. The Voice could be a helpful character in the development and the fight against the demon.\n\n- Room and the Door: The room and the locked door could be the representation of the Consciousness's mind and the next room the Consciousness the desire to the next stage of the journey.\n\nWays to Develop:\n\n- The player and the character can develop The Voice's character and the level of the relationship the the Voice and the character. The Voice could become the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the "
-if (response.includes("the the the"))
-{
-  var pos = response.indexOf("the the the")
-  response = response.substring(0,pos+3)
-  Logger.log(response)
-}
-
 }

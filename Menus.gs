@@ -67,7 +67,7 @@ function test()
 
 function menuPlay(testing) 
 {
-  if(testing == 1){var ui = SpreadsheetApp.getUi();}
+  if(testing != 1){var ui = SpreadsheetApp.getUi();}
   var spreadsheet = SpreadsheetApp.getActive();
   var sheet = spreadsheet.getActiveSheet()
   var sheetName = sheet.getSheetName()

@@ -10,7 +10,7 @@ function narratorAI(prompt,gameState,sheet)
   // Add the mechanic information to the prompt and push it to the narrator
   var narrator = []
   narrator.push({"role":"system","content":"You are a game master for a text-based style role playing game called " +gameState.game.name+". Focus on giving the player a chance for input. Use skill checks, dice rolls, and have combat. The player can die and has limited inventory. "}
-                ,{"role": "user", "content": "Load my story so far."}
+                ,{"role": "user", "content": "Load my story timeline so far."}
                 ,{"role": "assistant", "content": gameState.game.summary}
                 ,{"role": "user", "content": "Load my current scene."}
                 ,{"role": "assistant", "content": gameState.game.scene}
@@ -31,7 +31,7 @@ function mechanicsAI(prompt, gameState, sheet)
   gameState = inventoryAI(prompt,gameState,sheet)
   var mechanic = []
   mechanic.push({"role":"system","content":"You are a subsystem that tracks inventory, status, plot, and rules for a text based role playing game. You will respond with details about inventory and probability and anything that may influence the narrator. The player should not know about you, your responses will be given to chatGPT API as along with the user input to create a story for " +gameState.game.name+". You have a fun but secret role."}
-                ,{"role": "user", "content": "Load my story so far."}
+                ,{"role": "user", "content": "Load my story timeline so far."}
                 ,{"role": "assistant", "content": gameState.game.summary}
                 ,{"role": "user", "content": "Load my current scene."}
                 ,{"role": "assistant", "content": gameState.game.scene}
@@ -50,7 +50,7 @@ function plotAI(prompt, gameState, sheet)
 {
   var plot = []
   plot.push({"role":"system","content":"You are a subsystem that tracks plot points and key characters for the text-based role playing game called" +gameState.game.name+". You'll track key plot details, see if anything has been added from the current scene interaction and suggest ways in which plots might develop by influencing the narrator."}
-                ,{"role": "user", "content": "Load my story so far."}
+                ,{"role": "user", "content": "Load my story timeline so far."}
                 ,{"role": "assistant", "content": gameState.game.summary}
                 ,{"role": "user", "content": "Load my current scene."}
                 ,{"role": "assistant", "content": gameState.game.scene}
@@ -67,7 +67,7 @@ function inventoryAI(prompt, gameState, sheet)
 {
   var inventory = []
   inventory.push({"role":"system","content":"You are a subsystem that tracks inventory for the text-based role playing game called" +gameState.game.name+". You'll track inventory, if it's the start of the game think of what might be a good starting inventory. You'll track items in the scene see if anything has been added. Keep responses focused on the items and objects."}
-                ,{"role": "user", "content": "Load my story so far."}
+                ,{"role": "user", "content": "Load my story timeline so far."}
                 ,{"role": "assistant", "content": gameState.game.summary}
                 ,{"role": "user", "content": "Load my current scene."}
                 ,{"role": "assistant", "content": gameState.game.scene}
@@ -92,9 +92,9 @@ function designerAI(prompt,gameState,sheet,rowImage,rowDescription)
   // rowDescription = getRowSceneImagery()
   var designer = []
   designer.push({"role":"system","content":"You are video game designer in charge of creating art for a text-based rpg called " +gameState.game.name+". Your job is is to assist the narrator by creating prompts for AI created images. Try to keep the style consistent for the game. Don't let prompts fail because of censorship."}
-    ,{"role": "user", "content": "Load my story so far."}
+    ,{"role": "user", "content": "Load my story timeline so far."}
     ,{"role": "assistant", "content": gameState.game.summary}
-    ,{"role": "user", "content": "Please create one description of the following scene that can be used by AI (Dalle API) to generate an image.\n" + prompt})
+    ,{"role": "user", "content": "Please create one description that can be used by AI (Dalle API) to generate an image. Destill the esences of the following scene into a single image. \nScene:" + prompt})
   Logger.log("DesignerAI")
   var description = sendPrompt(designer,.6,-.1)
   // var description = ""
@@ -122,7 +122,7 @@ function assistAI(gameState,sheet)
   gameState = getGameState(sheet)
   const assistant = []
   assistant.push({"role":"system","content":"You are an assistant bot for a text-based RPG narrator in " +gameState.game.name+". Your job is to take a conversation thread from the narrator and user to provide some possible ideas. Don't give too much detail on what will happen. Lean into the narrative story and setting."}
-                  ,{"role": "user", "content": "Load my story so far."}
+                  ,{"role": "user", "content": "Load my story timeline so far."}
                   ,{"role": "assistant", "content": gameState.game.summary}
                   ,{"role": "user", "content": "Load my current scene."}
                   ,{"role": "assistant", "content": gameState.game.scene}
@@ -136,34 +136,16 @@ function assistAI(gameState,sheet)
 
 function timelineAI(gameState,sheet)
 {
-  // Check gameState story length, if it's 5 or more, send story off for a summary
-  if (gameState.game.story.length >= 5)
-  {
-    const timeline = []
-    timeline.push({"role":"system","content":"You are the timeline bot. Your job is to track and summarize the story so far in " +gameState.game.name+". You will be used to generate the timeline that the other bots will use to craft the next scene."}
-                  ,{"role": "user", "content": "Please load in my story so far."})
-  for (let i = 0; i < gameState.game.story.length; i++) 
-  {
-    timeline.push(gameState.game.story[i])
-  }
-    timeline.push({"role": "user", "content": "Please provide a short timeline of my story events so far. Capturing the world, characters, and plot deelopment."})
-    // Replace gameState.game.story with the summary as an array with one element
-  Logger.log("TimelineAI - Compression")
-    gameState.game.story = [sendPrompt(timeline,1.2,.4)]
-  }
+  // Check gameState story length,
   const timeline = []
-  timeline.push({"role":"system","content":"You are the timeline bot. Your job is to track and summarize the story so far in " +gameState.game.name+". You will be used to generate the timeline that the other bots will use to craft the next scene."}
-                ,{"role": "user", "content": "Please load in my story so far."})
-  for (let i = 0; i < gameState.game.story.length; i++) 
-  {
-    timeline.push(gameState.game.story[i])
-  }
-  timeline.push({"role": "user", "content": "Load my current scene."}
+  timeline.push({"role":"system","content":"You are the timeline bot. Your job is to track and the timeline of the story so far in " +gameState.game.name+". You will be used to generate the timeline that the other bots will use to craft the next scene."}
+                ,{"role": "user", "content": "Load my story timeline so far."}
+                ,{"role": "assistant", "content": gameState.game.summary}
+                ,{"role": "user", "content": "Load my current scene."}
                 ,{"role": "assistant", "content": gameState.game.scene}
-                ,{"role": "user", "content": "Please provide a short timeline of my story events so far. Capturing the world, characters, and plot deelopment."})
+                ,{"role": "user", "content": "Please provide a short timeline of my story events so far. With a brief summary of the story setting."})
   Logger.log("TimelineAI")
   gameState.game.summary = sendPrompt(timeline,1.2,.4)
-  gameState.game.story.push({"role": "assistant", "content": gameState.game.summary})
   postGameState(gameState,sheet)
   postSummary(gameState.game.summary,gameState,sheet)
   return gameState
