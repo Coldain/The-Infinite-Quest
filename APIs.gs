@@ -72,6 +72,16 @@ function sendPrompt(prompt, chaos, frequency_penalty)
         else
         {
           var response = data.choices[0].message.content
+          if(response.includes("the player's the player's"))
+          {
+            response = response.substring(0,response.indexOf("the player's the player's")+12)
+            Logger.log(response)
+          }
+          if(response.includes("the player the player"))
+          {
+            response = response.substring(0,response.indexOf("the player the player")+10)
+            Logger.log(response)
+          }
           if(response.includes("the the the"))
           {
             response = response.substring(0,response.indexOf("the the the")+3)
@@ -80,11 +90,6 @@ function sendPrompt(prompt, chaos, frequency_penalty)
           if(response.includes("a a a"))
           {
             response = response.substring(0,response.indexOf("a a a")+1)
-            Logger.log(response)
-          }
-          if(response.includes("the player the player"))
-          {
-            response = response.substring(0,response.indexOf("the player the player")+10)
             Logger.log(response)
           }
           
@@ -125,7 +130,7 @@ function sendDescription(prompt)
     // Adjust payload and endpoint
     var endpoint = baseUri + "/images/generations";
     var payload = {}
-    payload.prompt = "Generate a pixel art image of " + prompt.substring(0,900) + ". Please simplify the image to be suitable for a text-based game."
+    payload.prompt = "Generate a pixel art, detailed and intricate, image of " + prompt.substring(0,900) + ". Please simplify the image to be suitable for a text-based game."
     payload.n = 1
     payload.size = "512x512"
                   
@@ -180,4 +185,31 @@ function sendDescription(prompt)
     Logger.log(err.stack)
     throw new Error(err.message)
   }
+}
+
+function testTheTheThe()
+{
+  var response = "Great! Here are some updated plot points, key characters, and ways to develop them based on the player's input:\n\nPlot Points:\n- The rusty door with the rusty key: The player comes across a potentially dangerous door in a dark and scary room, and opts to progress further by opening it with a rusty key. The door may open up to unexpected challenges, twists, or revelations that may impact the player's story moving forward.\n\nKey Characters:\n- Player: The player continues to navigate the realm, entering a frightening new area, and prepared to face whatever mind demons may be lurking behind the door.\n- The Voice: The disembodied guide who has been helping the player navigate the realm and providing guidance.\n- The two faint manifestations: The player's husband's brain manifestation and another energy figure they have encountered, who are glowing beside the player as they prepare to take on the next challenge.\n\nWays to Develop the Plot and Characters:\n- The rusty door and the key: The player's decision to proceed through the door may lead to new revelations or encounters that help the player uncover the mysteries of the realm and their own memories. The door and the key may be significant to the player's progress in the story, and the player may need to use their wit and talents to overcome the obstacles that await on the other side.\n- The Voice and the two faint manifestations: The player may choose to speak to The Voice and the two faint manifestations to gain more information on the challenges that await the player beyond the door. The player may learn more about the realm and the hidden dangers that the player may face, and the player may also deepen the connections the player has with the other characters in the story, the player's the player's the player the player the player the player the player the player the player the player the player the player the player the player the player the player the player the player the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the "
+  
+          if(response.includes("the player's the player's"))
+          {
+            response = response.substring(0,response.indexOf("the player's the player's")+12)
+            Logger.log(response)
+          }
+          if(response.includes("the player the player"))
+          {
+            response = response.substring(0,response.indexOf("the player the player")+10)
+            Logger.log(response)
+          }
+          if(response.includes("the the the"))
+          {
+            response = response.substring(0,response.indexOf("the the the")+3)
+            Logger.log(response)
+          }
+          if(response.includes("a a a"))
+          {
+            response = response.substring(0,response.indexOf("a a a")+1)
+            Logger.log(response)
+          }
+
 }

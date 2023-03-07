@@ -27,19 +27,21 @@ function narratorAI(prompt,gameState,sheet)
 
 function mechanicsAI(prompt, gameState, sheet)
 {
-  gameState = plotAI(prompt,gameState,sheet)
-  gameState = inventoryAI(prompt,gameState,sheet)
+  // gameState = plotAI(prompt,gameState,sheet)
+  // gameState = inventoryAI(prompt,gameState,sheet)
   var mechanic = []
-  mechanic.push({"role":"system","content":"You are a subsystem that tracks inventory, status, plot, and rules for a text based role playing game. You will respond with details about inventory and probability and anything that may influence the narrator. The player should not know about you, your responses will be given to chatGPT API as along with the user input to create a story for " +gameState.game.name+". You have a fun but secret role."}
+  mechanic.push({"role":"system","content":"You are a subsystem that tracks inventory, status, and rules for a text based role playing game " +gameState.game.name+". You will respond with details about inventory and suggests probabilites for the scene."}
                 ,{"role": "user", "content": "Load my story timeline so far."}
                 ,{"role": "assistant", "content": gameState.game.summary}
                 ,{"role": "user", "content": "Load my current scene."}
                 ,{"role": "assistant", "content": gameState.game.scene}
-                ,{"role": "user", "content": "Load my current plot and characters."}
-                ,{"role": "assistant", "content": gameState.game.plot}
-                ,{"role": "user", "content": "Load my current inventory and scene objects."}
-                ,{"role": "assistant", "content": gameState.game.inventory}
-                ,{"role": "user", "content": "I'm the narrator for a text-based RPG! What inventory, objects in the scene, character details, and plot point should I be aware of and any probabilities you think would make the story more engaging? This is what the user responded with. \nPlayer Input:" + prompt})
+                ,{"role": "user", "content": "Load past inventory details."}
+                ,{"role": "assistant", "content": gameState.game.mechanic}
+                // ,{"role": "user", "content": "Load my current plot and characters."}
+                // ,{"role": "assistant", "content": gameState.game.plot}
+                // ,{"role": "user", "content": "Load my current inventory and scene objects."}
+                // ,{"role": "assistant", "content": gameState.game.inventory}
+                ,{"role": "user", "content": "Please list out the inventory (with properties) and any objects of import in the scene. List a few probabilities of how things could go wrong or right based upon the players following actions. \nPlayer Input:" + prompt})
   Logger.log("mechanicsAI")
   var response = sendPrompt(mechanic,.7,-.2)
   postMechanics(response,gameState,sheet)
