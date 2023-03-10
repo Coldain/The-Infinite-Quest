@@ -11,6 +11,9 @@
     }, {
       "menuName": "newGame",
       "functionName": "newGame"
+    }, {
+      "menuName": "Untitled Macro",
+      "functionName": "UntitledMacro"
     }]
   }
 }

@@ -5,7 +5,6 @@ function sendPrompt(prompt, chaos, frequency_penalty)
   {
     // Get token details and baseUri from documentProperties, check to see if the URI needs to use old endpoint or not (depends on the API call and the region)
     var userProperties = PropertiesService.getUserProperties();
-    var scriptProperties = PropertiesService.getScriptProperties();
     var token = userProperties.getProperty("token")
     if(token == null)
     {
@@ -115,7 +114,7 @@ function sendPrompt(prompt, chaos, frequency_penalty)
   }
 }
 
-function sendDescription(prompt) 
+function sendDescription(prompt,scriptProperties) 
 {
   try
   {
@@ -130,7 +129,7 @@ function sendDescription(prompt)
     // Adjust payload and endpoint
     var endpoint = baseUri + "/images/generations";
     var payload = {}
-    payload.prompt = "Generate a pixel art, detailed and intricate, image of " + prompt.substring(0,900) + ". Please simplify the image to be suitable for a text-based game."
+    payload.prompt = "Generate a detailed and intricate images, in the style of " +scriptProperties.getProperty("style") +" art. For a " +scriptProperties.getProperty("modeDescription") +". Based following story. \nStory:" + prompt.substring(0,900) + "."
     payload.n = 1
     payload.size = "512x512"
                   
