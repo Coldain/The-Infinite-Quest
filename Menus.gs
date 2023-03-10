@@ -3,8 +3,8 @@ function menuIntialize()
   var ui = SpreadsheetApp.getUi();
   var gameMenu = ui.createMenu('Text RPG')
   gameMenu.addItem("New Game", 'menuNewGame').addItem("Play", 'menuPlay').addItem("Suggestions", 'menuSuggestions');
-  gameMenu.addSubMenu(ui.createMenu("Game Type").addItem("Text-Based RPG", 'menuTextRPG').addItem("Pen & Paper RPG", 'menuPenRPG').addItem("Choose your own adventure book", 'menuAdventureBook').addItem("point & click-esq game", 'menuClickGame').addItem("table top rpg", 'menuTableRPG'));
-  gameMenu.addSubMenu(ui.createMenu("Art Style").addItem("DOS", 'menuDOS').addItem("Super Nintendo", 'menuSNES').addItem("Playstation One", 'menuPS1').addItem("Modern Video Game", 'menuModern').addItem("Pixel Art", 'menuPixel'));
+  gameMenu.addSubMenu(ui.createMenu("Game Type").addItem("Text-Based RPG", 'menuTextRPG').addItem("Pen & Paper RPG", 'menuPenRPG').addItem("Choose your own adventure book", 'menuAdventureBook').addItem("point & click-esq game", 'menuClickGame').addItem("table top rpg", 'menuTableRPG').addItem("custom", 'menuModeCustom'));
+  gameMenu.addSubMenu(ui.createMenu("Art Style").addItem("DOS", 'menuDOS').addItem("Super Nintendo", 'menuSNES').addItem("Playstation One", 'menuPS1').addItem("Modern Video Game", 'menuModern').addItem("Pixel Art", 'menuPixel').addItem("Ink", 'menuInk').addItem("custom", 'menuStyleCustom'));
 
   //.addItem("Time Fracture", 'menuTimeFracture')
   gameMenu.addToUi();
@@ -226,7 +226,7 @@ function menuPixel()
 }
 function menuInk()
 {
-  menuStyleSetting("pencil shaded")
+  menuStyleSetting("ink-based cross-hatch shaded")
 }
 
 
@@ -286,4 +286,34 @@ function menuStyles(testing)
 function menuStyleTesting()
 {
   menuStyles(1)
+}
+function menuStyleCustom()
+{
+  var ui = SpreadsheetApp.getUi();
+  var result = ui.prompt(
+    description,
+    'The type of game you want the system to try and emulate.',
+    ui.ButtonSet.OK_CANCEL);
+  // Process the user's response.
+  var button = result.getSelectedButton();
+  var text = result.getResponseText();
+  if (button == ui.Button.OK && text.length > 0) 
+  {
+    menuStyleSetting(text)
+  }
+}
+function menuModeCustom()
+{
+  var ui = SpreadsheetApp.getUi();
+  var result = ui.prompt(
+    description,
+    'Please enter the style of art you want the system to try and emulate.',
+    ui.ButtonSet.OK_CANCEL);
+  // Process the user's response.
+  var button = result.getSelectedButton();
+  var text = result.getResponseText();
+  if (button == ui.Button.OK && text.length > 0) 
+  {
+    menuModeSetting(text)
+  }
 }

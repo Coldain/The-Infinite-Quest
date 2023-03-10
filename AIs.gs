@@ -83,7 +83,7 @@ function inventoryAI(prompt, gameState, sheet,scriptProperties)
   return gameState
 }
 
-function designerAI(prompt,gameState,sheet,rowImage,rowDescription,scriptProperties)
+function designerAI(prompt,gameState,sheet,rowImage,rowDescription,scriptProperties,skipPaint)
 {
   // var prompt = ""
   // var spreadsheet = SpreadsheetApp.getActive();
@@ -100,19 +100,27 @@ function designerAI(prompt,gameState,sheet,rowImage,rowDescription,scriptPropert
   Logger.log("DesignerAI")
   var description = sendPrompt(designer,.6,-.1,)
   // var description = ""
-  sheet.getRange(rowDescription,gameState.game.activeColumn).setValue(description)
-  try
+  if (skipPaint != 1 )
   {
-    var imageURL = sendDescription(description,scriptProperties)
-    var fileID = downloadFile(imageURL)
-    var inlineURL = "https://drive.google.com/uc?export=download&id="+fileID
-    sheet.getRange(rowImage,gameState.game.activeColumn).setValue('=IMAGE("'+inlineURL+'")')
+    sheet.getRange(rowDescription,gameState.game.activeColumn).setValue(description)
+    try
+    {
+      var imageURL = sendDescription(description,scriptProperties)
+      var fileID = downloadFile(imageURL)
+      var inlineURL = "https://drive.google.com/uc?export=download&id="+fileID
+      sheet.getRange(rowImage,gameState.game.activeColumn).setValue('=IMAGE("'+inlineURL+'")')
+    }
+    catch
+    {
+      Logger.log("Promblem with image.")
+      sheet.getRange(rowImage,gameState.game.activeColumn).setValue("Promblem with image.")
+    }
   }
-  catch
+  else
   {
-    Logger.log("Promblem with image.")
-    sheet.getRange(rowImage,gameState.game.activeColumn).setValue("Promblem with image.")
+    return description
   }
+
   return gameState
 }
 
@@ -154,49 +162,54 @@ function timelineAI(gameState,sheet,scriptProperties)
   return gameState
 }
 
-function styleTest(gameState, sheet,scriptProperties)
+function styleTest(gameState,sheet,scriptProperties)
 {
   // this will take input from the timelineAI and user input to generate the next scene
-  sheet.getRange(getRowPlot(),2).setValue("Art Style")
+  sheet.getRange(getRowPlot(),2).setValue("Art Style") 
   sheet.getRange(getRowInventory(),2).setValue("Game Type")
   postPrompt(gameState.game.prompt,gameState,sheet)
   postDescription(gameState.game.scene,gameState,sheet)
+  var promptImagery = designerAI(postPrompt,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties,1)
+  var sceneImagery = designerAI(postDescription,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties,1)
+  // var promptImagery = "The image is of a powerful figure, sword in hand, standing bravely at the forefront of a small village. The figure is covered in gleaming armor with a fierce look of determination written across their face. In the background, we can see the silhouette of a small army of menacing invaders, caught off guard as they were about to launch a surprise attack on the defenseless residents of the village. Behind the armored figure, villagers can be seen peeking out of their homes, safely watching as the protector takes charge of the situation. The setting is a peaceful and quaint countryside, with rolling hills and a few simple homes dotting the landscape. It's a moment of heroism and leadership, where the protector of the village shows no fear in the face of danger and inspires hope in the hearts of those they have vowed to protect."
+  // var sceneImagery = "A brave warrior leading a group of villagers charging forward into battle, swords in hand, with determination etched on their faces. The sun shines brightly behind them casting a golden glow on the scene. In the distance, a line of trees can be seen, where hidden archers have been attacking the village. One arrow whizzes past the warrior, narrowly missing their face. The warrior raises their sword to block the next incoming arrow, as a villager next to them readies their bow to return fire. Dark clouds loom in the sky, hinting at the danger and potential loss to come."
+
 
   // All the DOS Styles -----
   menuDOS()
     menuTextRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuPenRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuAdventureBook()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuClickGame()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuTableRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
   // ----- All the DOS Styles
   // All the SNES Styles -----
@@ -204,36 +217,36 @@ function styleTest(gameState, sheet,scriptProperties)
     menuTextRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuPenRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuAdventureBook()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuClickGame()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuTableRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
   // ----- All the SNES Styles
   // All the PS1 Styles -----
@@ -241,36 +254,36 @@ function styleTest(gameState, sheet,scriptProperties)
     menuTextRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuPenRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuAdventureBook()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuClickGame()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuTableRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
   // ----- All the PS1 Styles
   // All the Modern Styles -----
@@ -278,36 +291,36 @@ function styleTest(gameState, sheet,scriptProperties)
     menuTextRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuPenRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuAdventureBook()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuClickGame()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuTableRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
   // ----- All the Moder Styles
   // All the Pixel Styles -----
@@ -315,36 +328,36 @@ function styleTest(gameState, sheet,scriptProperties)
     menuTextRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuPenRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuAdventureBook()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuClickGame()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuTableRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
   // ----- All the Pixel Styles
   // All the Ink Styles -----
@@ -352,39 +365,92 @@ function styleTest(gameState, sheet,scriptProperties)
     menuTextRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuPenRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuAdventureBook()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuClickGame()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
 
     menuTableRPG()
     postPlot(scriptProperties.getProperty("style"),gameState,sheet)
     postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
-    gameState = designerAI(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
-    gameState = designerAI(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
     gameState.game.activeColumn++  
   // ----- All the Ink Styles
+  // All the Custom Styles -----
+  menuModeCustom()
+  menuStyleCustom()
+    menuTextRPG()
+    postPlot(scriptProperties.getProperty("style"),gameState,sheet)
+    postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
+    draw(promptImagery,getRowPromptImage(),gameState,scriptProperties,sheet)
+    draw(sceneImagery,getRowSceneImage(),gameState,scriptProperties,sheet)
+    gameState.game.activeColumn++  
 
+    menuPenRPG()
+    postPlot(scriptProperties.getProperty("style"),gameState,sheet)
+    postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
+    gameState = draw(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
+    gameState = draw(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    gameState.game.activeColumn++  
 
+    menuAdventureBook()
+    postPlot(scriptProperties.getProperty("style"),gameState,sheet)
+    postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
+    gameState = draw(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
+    gameState = draw(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    gameState.game.activeColumn++  
+
+    menuClickGame()
+    postPlot(scriptProperties.getProperty("style"),gameState,sheet)
+    postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
+    gameState = draw(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
+    gameState = draw(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    gameState.game.activeColumn++  
+
+    menuTableRPG()
+    postPlot(scriptProperties.getProperty("style"),gameState,sheet)
+    postInventory(scriptProperties.getProperty("mode"),gameState,sheet)
+    gameState = draw(gameState.game.prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),scriptProperties)
+    gameState = draw(gameState.game.scene,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),scriptProperties)
+    gameState.game.activeColumn++  
+  // ----- All the Custom Styles
   return gameState
+}
+
+function draw(description,rowImage,gameState,scriptProperties,sheet)
+{
+  try
+    {
+      var imageURL = sendDescription(description,scriptProperties)
+      var fileID = downloadFile(imageURL)
+      var inlineURL = "https://drive.google.com/uc?export=download&id="+fileID
+      sheet.getRange(rowImage,gameState.game.activeColumn).setValue('=IMAGE("'+inlineURL+'")')
+    }
+    catch
+    {
+      Logger.log("Promblem with image.")
+      sheet.getRange(rowImage,gameState.game.activeColumn).setValue("Promblem with image.")
+    }
+    return gameState
 }
