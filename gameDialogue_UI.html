@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      /* Add any custom styles for your dialog here */
+    </style>
+  </head>
+  <body>
+    <h1>Text RPG</h1>
+    <div id="gameOptions">
+      <h2>Game Type</h2>
+      <select id="gameTypeSelect" onchange="showNarratorInfo()">
+        <!-- Options will be added dynamically -->
+      </select>
+      <div id="narratorInfo"></div>
+      <!-- ... -->
+    </div>
+
+    <div id="gameWindow">
+      <!-- Add a container for the game window where the game content will be displayed -->
+    </div>
+    <script>
+      // Add JavaScript functions to handle button clicks and other interactions
+      function applyGameOptions() {
+        var gameType = document.querySelector('input[name="gameType"]:checked').value;
+        google.script.run.setGameType(gameType);
+      }
+
+      function loadGameOptions() {
+        google.script.run.withSuccessHandler(populateGameTypeOptions).getPersonas();
+      }
+
+      function populateGameTypeOptions(personas) {
+        var select = document.getElementById("gameTypeSelect");
+        personas.forEach(function (persona, index) {
+          var option = document.createElement("option");
+          option.value = index;
+          option.textContent = persona.name;
+          select.appendChild(option);
+        });
+        showNarratorInfo();
+      }
+
+      // Call loadGameOptions when the dialog is loaded
+      document.addEventListener("DOMContentLoaded", loadGameOptions);
+
+      function showNarratorInfo() {
+          var select = document.getElementById("gameTypeSelect");
+          var selectedIndex = select.value;
+          google.script.run.withSuccessHandler(function (personas) {
+            var narratorInfo = document.getElementById("narratorInfo");
+            narratorInfo.textContent = personas[selectedIndex].narrator;
+          }).getPersonas();
+        }
+
+        // Add event listeners for hover and focus events
+        document.getElementById("gameTypeSelect").addEventListener("mouseover", function (event) {
+          if (event.target.tagName === "OPTION") {
+            event.target.parentNode.value = event.target.value;
+            showNarratorInfo();
+          }
+        });
+
+        document.getElementById("gameTypeSelect").addEventListener("mouseout", function (event) {
+          if (event.target.tagName === "OPTION") {
+            showNarratorInfo();
+          }
+        });
+
+    </script>
+  </body>
+</html>

@@ -29,7 +29,7 @@ Pen & Paper RPG: Include skill checks, ability scores, and character sheets to e
 // }
 
 function menuIntialize() {
-  var htmlOutput = HtmlService.createHtmlOutputFromFile('gameDialog.html')
+  var htmlOutput = HtmlService.createHtmlOutputFromFile('gameDialogue.html')
     .setWidth(800)
     .setHeight(600);
   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Text RPG');
