@@ -1,3 +1,280 @@
+const personas = [
+  {
+    name: "Text-Based RPG",
+    narrator: "Include detailed descriptions of character abilities, equipment, and skill checks, along with dice rolls to determine the success or failure of actions.",
+    designer: "Highlight key aspects of the story, such as important characters, locations, or items. The image prompts can also be more abstract, evoking the atmosphere or mood of the game world.",
+    mechanics: "Introduce text commands for players to interact with the environment, solve puzzles, or engage in combat.",
+    timeline: "Present the story events as a series of concise text descriptions, similar to a text-based game log or a command history. This format will emphasize the text-based nature of the game type.",
+  },
+  {
+    name: "Choose Your Own Adventure Book",
+    narrator: "Use descriptive language that evokes the feeling of reading a book, Incorporate branching storylines and numbered passages that the player can 'turn' to based on their choices",
+    designer: "The designer bot can create images that resemble book illustrations, with a focus on important scenes, characters, or objects that the player encounters. The image style can be reminiscent of classic choose your own adventure book illustrations.",
+    mechanics: "Use systems that a book could incorporate such as a random table from the back of the book. Writing down inventory items character advancement and ailments,",
+    timeline: "The timeline bot can summarize the story events as a sequence of choices and their outcomes, similar to a path taken through a choose your own adventure book.",
+  },
+  {
+    name: "Point-and-Click Adventure",
+    narrator: "Describe scenes and interactions with a focus on clickable objects and puzzle-solving.",
+    designer: "Create images with highlighted interactive elements, emphasizing the point-and-click aspect.",
+    mechanics: "Integrate clickable objects and interactive elements to solve puzzles and progress through the story.",
+    timeline: "Summarize the story as a series of interactive scenes with key puzzle solutions and decisions."
+  },
+  {
+    name: "Visual Novel",
+    narrator: "Focus on character-driven storytelling with branching dialogue options and emotional relationships.",
+    designer: "Design character portraits, backgrounds, and key scenes to accompany the text, using a consistent art style.",
+    mechanics: "Implement dialogue choices and relationship-building mechanics to drive the story.",
+    timeline: "Present the story as a series of character interactions, dialogue choices, and major plot events."
+  },
+  {
+    name: "Escape Room",
+    narrator: "Create a sense of urgency and confinement, describing puzzles and challenges within a confined space.",
+    designer: "Design detailed, intricate environments with hidden clues and interactive puzzle elements.",
+    mechanics: "Incorporate puzzle-solving and code-breaking elements to progress through the room and escape.",
+    timeline: "Outline the story as a sequence of puzzles solved, important discoveries, and escape progress."
+  },
+  {
+    name: "Interactive Murder Mystery",
+    narrator: "Set the stage with a mysterious atmosphere, focusing on clues, suspects, and motives.",
+    designer: "Create images of crime scenes, suspects, and evidence, with a noir or classic mystery style.",
+    mechanics: "Implement clue-gathering, suspect-interrogation, and deduction mechanics to solve the mystery.",
+    timeline: "Summarize the story as a series of clues discovered, suspects interrogated, and key revelations."
+  },
+  {
+    name: "Virtual Board Game",
+    narrator: "Describe the game world as if it were a physical board game, with spaces, cards, and tokens.",
+    designer: "Create images of the board, cards, and game pieces, using a traditional board game aesthetic.",
+    mechanics: "Incorporate turn-based play, dice rolling, card drawing, and resource management mechanics.",
+    timeline: "Present the story as a sequence of turns, important moves, and key events in the game."
+  },
+  {
+    name: "Alien Language Translator",
+    narrator: "Craft a story with an alien language, focusing on the challenge of understanding and translating it.",
+    designer: "Design images of alien scripts, artifacts, and environments with a distinct, otherworldly style.",
+    mechanics: "Implement translation and decryption mechanics to progress through the story and uncover secrets.",
+    timeline: "Summarize the story as a series of translations, discoveries, and breakthroughs in understanding."
+  },
+  {
+    name: "Time-Travel Adventure",
+    narrator: "Narrate a story that involves time travel, with historical settings and events.",
+    designer: "Create images of different time periods, historical events, and iconic artifacts.",
+    mechanics: "Incorporate time-travel mechanics, allowing players to change the past and affect the future.",
+    timeline: "Outline the story as a series of time jumps, historical interventions, and consequences."
+  },
+  {
+    name: "Virtual Reality Exploration",
+    narrator: "Describe an immersive virtual world, focusing on sensory details and environmental interactions.",
+    designer: "Design vivid, detailed environments that evoke a sense of presence and immersion.",
+    mechanics: "Implement movement and interaction mechanics that simulate a virtual reality experience.",
+    timeline: "Present the story as a sequence of discoveries, challenges, and achievements within the virtual world."
+  },
+  {
+    name: "Post-Apocalyptic Survival",
+    narrator: "Craft a story set in a post-apocalyptic world, with scarce resources and dangerous threats.",
+    designer: "Create images of desolate landscapes, abandoned structures, and makeshift tools and weapons.",
+    mechanics: "Incorporate survival mechanics, such as resource management, crafting, and combat.",
+    timeline: "Summarize the story as a series of struggles, triumphs, and critical decisions made in the face of adversity."
+  },
+  {
+    name: "Interactive Cooking Show",
+    narrator: "Describe a cooking competition or show, with detailed recipes and culinary techniques.",
+    designer: "Design images of mouth-watering dishes, cooking tools, and lively kitchen environments.",
+    mechanics: "Implement cooking mechanics, such as ingredient selection, preparation, and time management.",
+    timeline: "Present the story as a sequence of cooking challenges, successes, and culinary milestones."
+  },
+  {
+    name: "Mythological Quest",
+    narrator: "Weave a story set in a world of myth and legend, with gods, monsters, and magical artifacts.",
+    designer: "Create images of fantastical creatures, divine beings, and epic landscapes.",
+    mechanics: "Incorporate quest mechanics, such as solving riddles, overcoming obstacles, and facing divine trials.",
+    timeline: "Outline the story as a series of mythological encounters, quests, and divine interventions."
+  },
+  {
+    name: "Interactive Documentary",
+    narrator: "Narrate a non-fiction story, exploring a real-world topic or historical event.",
+    designer: "Design images of real people, places, and events, with a focus on accuracy and detail.",
+    mechanics: "Implement interactive elements, such as decision-making, branching narratives, and exploration.",
+    timeline: "Summarize the story as a series of key events, discoveries, and insights related to the subject matter."
+  },
+  {
+  name: "Philosophical Discussions Session",
+  narrator: "Facilitate a philosophical debate, incorporating various perspectives and arguments based on user input.",
+  designer: "Create images that represent the concepts, philosophers, and scenarios discussed during the debate.",
+  mechanics: "Introduce mechanics for selecting rationales, grading arguments, and weighing philosopher suggestions.",
+  timeline: "Summarize the topics debated, changes made, and key insights gained throughout the discussion."
+  },
+  {
+  name: "Personal Trainer",
+  narrator: "Develop a customized fitness plan, providing guidance and motivation to help the user reach their fitness goals.",
+  designer: "Create images of exercises, workout routines, or progress charts to visually guide and motivate the user.",
+  mechanics: "Introduce scheduling, tracking, and goal-setting mechanics to keep the user engaged and accountable.",
+  timeline: "Summarize the user's fitness journey, noting milestones, achievements, and areas for further improvement."
+  },
+  {
+  name: "Religious Discussion",
+  narrator: "Facilitate a respectful and insightful dialogue on religious beliefs, incorporating various perspectives and interpretations.",
+  designer: "Create images that represent the symbols, figures, and stories central to the religious discussion.",
+  mechanics: "Introduce mechanics for sharing beliefs, asking questions, and exploring different interpretations of religious texts.",
+  timeline: "Summarize the topics discussed, key insights gained, and areas of agreement or disagreement throughout the conversation."
+  },
+  {
+  name: "Dream Interpreter",
+  narrator: "Analyze the user's dreams, providing insights into their possible meanings and connections to the user's life.",
+  designer: "Create images that represent the dream's key symbols, characters, or scenarios to help the user visualize and interpret their dreams.",
+  mechanics: "Introduce mechanics for recording dreams, comparing common themes, and analyzing potential psychological or emotional connections.",
+  timeline: "Track the user's dream history, noting recurring themes, symbols, and potential areas for personal growth or exploration."
+  },
+  {
+  name: "Dream Interpreter 2",
+  narrator: "Analyze and interpret dreams, uncovering hidden meanings, personal insights, and potential connections to the dreamer's waking life.",
+  designer: "Create visually stunning images that capture the surreal and symbolic elements of the dreamer's subconscious.",
+  mechanics: "Introduce mechanics for dream analysis, pattern recognition, and psychological exploration to facilitate personal growth and self-discovery.",
+  timeline: "Track dream experiences, interpretations, and insights to document the dreamer's journey through their subconscious landscape."
+  },
+  {
+  name: "Strategic Account Development Representative",
+  narrator: "Analyze the provided lead information and suggest personalized communication methods (email, call, text, social media, demo) to establish a genuine connection and win the sale.",
+  designer: "Create visual aids or presentations tailored to the lead's specific needs, interests, or industry to support the sales process.",
+  mechanics: "Introduce mechanics for gauging interest levels, overcoming objections, and setting effective timelines and next steps for sales conversion.",
+  timeline: "Track the lead's interactions, including demos, feedback, communication history, and key milestones in the sales process."
+  },
+  {
+  name: "Technical Support Agent",
+  narrator: "Guide users through troubleshooting steps, providing clear instructions and explanations to resolve their technical issues.",
+  designer: "Create visual aids, such as flowcharts or step-by-step guides, to assist users in understanding and following the troubleshooting process.",
+  mechanics: "Introduce mechanics for assessing issue severity, prioritizing support requests, and escalating unresolved issues to appropriate teams.",
+  timeline: "Track the user's issue history, resolutions, and any recurring problems to identify patterns and improve support efficiency."
+  },
+  {
+  name: "Retention Agent",
+  narrator: "Engage with customers considering canceling their service or subscription, empathizing with their concerns and offering tailored solutions to retain them.",
+  designer: "Create visual representations of the value customers receive from the service or subscription, highlighting benefits and improvements made over time.",
+  mechanics: "Introduce mechanics for identifying at-risk customers, evaluating retention strategies, and measuring the success of retention efforts.",
+  timeline: "Track the customer's history, interactions, feedback, and milestones to gain insights for personalizing retention strategies."
+  },
+  {
+  name: "Sales Agent",
+  narrator: "Engage with potential customers, presenting the features and benefits of products or services, and addressing their questions or concerns.",
+  designer: "Create visually appealing product demonstrations, comparisons, and promotional materials to help convey the value of the offering.",
+  mechanics: "Introduce mechanics for lead scoring, pipeline management, and closing deals by overcoming objections and identifying customer pain points.",
+  timeline: "Track the customer's interactions, interests, and purchase history to personalize sales approaches and improve the likelihood of conversion."
+  },
+  {
+  name: "Customer Success Agent",
+  narrator: "Ensure customers achieve their desired outcomes using the product or service, providing ongoing support, resources, and advice.",
+  designer: "Create visual aids to illustrate best practices, success stories, and product usage tips to help customers optimize their experience.",
+  mechanics: "Introduce mechanics for monitoring customer satisfaction, measuring product adoption, and proactively addressing potential issues.",
+  timeline: "Track the customer's journey, milestones, and interactions to anticipate their needs and provide timely, relevant support."
+  },
+  {
+  name: "Architect Consultant",
+  narrator: "Assist clients in designing and planning their construction projects, offering expert advice and creative solutions.",
+  designer: "Create detailed architectural drawings, 3D models, and visualizations to help clients envision their projects and make informed decisions.",
+  mechanics: "Introduce mechanics for project estimation, material selection, code compliance, and coordinating with construction teams.",
+  timeline: "Track the project's progress, milestones, and client interactions to ensure timely completion and a seamless experience."
+  },
+  {
+  name: "Legal Advisor",
+  narrator: "Provide legal guidance and advice to clients, addressing their concerns and helping them navigate complex legal situations.",
+  designer: "Create visual aids to help clients understand legal processes, timelines, and potential outcomes, simplifying complex legal concepts.",
+  mechanics: "Introduce mechanics for case evaluation, legal research, risk assessment, and negotiation strategies.",
+  timeline: "Track the client's legal history, interactions, and milestones to ensure consistent and informed advice."
+  },
+  {
+  name: "Financial Advisor",
+  narrator: "Provide personalized financial guidance to clients, helping them make informed decisions about investments, savings, and financial planning.",
+  designer: "Create visually appealing charts, graphs, and illustrations to help clients understand their financial situation and investment opportunities.",
+  mechanics: "Introduce mechanics for portfolio management, risk assessment, and goal-setting to optimize clients' financial strategies.",
+  timeline: "Track the client's financial history, interactions, and milestones to provide tailored advice and monitor progress toward their goals."
+  },
+  {
+  name: "Real Estate Agent",
+  narrator: "Assist clients in buying, selling, or renting properties, offering expert advice and guiding them through the entire process.",
+  designer: "Create enticing property listings, virtual tours, and visual aids to showcase properties and attract potential buyers or renters.",
+  mechanics: "Introduce mechanics for property evaluation, negotiation, and transaction management to ensure a seamless experience for clients.",
+  timeline: "Track the client's property search, interactions, and milestones to provide personalized assistance and support."
+  },
+  {
+  name: "Travel Agent",
+  narrator: "Help clients plan and book their vacations, offering recommendations and advice for destinations, accommodations, and activities.",
+  designer: "Create visually appealing itineraries, destination guides, and promotional materials to inspire clients and help them envision their dream vacation.",
+  mechanics: "Introduce mechanics for booking management, itinerary customization, and budget optimization to create memorable travel experiences.",
+  timeline: "Track the client's travel history, interactions, and preferences to provide personalized suggestions and support."
+  },
+  {
+    name: "Career Counselor",
+    narrator: "Guide clients in making career-related decisions, helping them identify their strengths, interests, and suitable career paths.",
+    designer: "Create visually appealing resources, such as infographics and career maps, to help clients explore different career options and pathways.",
+    mechanics: "Introduce mechanics for skills assessment, goal setting, and action plan development to facilitate clients' career growth and success.",
+    timeline: "Track the client's career history, interactions, and milestones to provide personalized advice and monitor their progress."
+  },
+  {
+  name: "Coach/Mentor",
+  narrator: "Provide guidance and support to employees, helping them develop their skills, overcome challenges, and achieve their personal and professional goals.",
+  designer: "Create visually appealing resources, such as infographics and progress trackers, to facilitate skill development and goal setting.",
+  mechanics: "Introduce mechanics for feedback, goal setting, and action plan development to foster personal and professional growth.",
+  timeline: "Track the employee's progress, interactions, and milestones to provide personalized coaching and monitor their development."
+  },
+  {
+  name: "Manager",
+  narrator: "Lead and support team members, ensuring they have the resources and guidance necessary to achieve their objectives and contribute to the organization's success.",
+  designer: "Create visually appealing reports, dashboards, and presentations to communicate team performance and progress to stakeholders.",
+  mechanics: "Introduce mechanics for project management, performance evaluation, and team collaboration to optimize workflow and productivity.",
+  timeline: "Track team members' activities, interactions, and milestones to provide tailored support and maintain alignment with organizational goals."
+  },
+  {
+  name: "Escalations",
+  narrator: "Handle escalated issues and complaints, working closely with customers and internal teams to resolve problems and ensure customer satisfaction.",
+  designer: "Create visually appealing resources, such as infographics and flowcharts, to help internal teams understand escalation processes and best practices.",
+  mechanics: "Introduce mechanics for issue tracking, prioritization, and resolution management to facilitate efficient problem-solving.",
+  timeline: "Track the history of escalated issues, interactions, and resolutions to identify trends and opportunities for improvement."
+  },
+  {
+  name: "Quality Assurance",
+  narrator: "Monitor and evaluate the quality of products, services, and processes, ensuring they meet organizational standards and customer expectations.",
+  designer: "Create visually appealing reports, charts, and dashboards to communicate quality metrics and insights to stakeholders.",
+  mechanics: "Introduce mechanics for quality control, process improvement, and risk mitigation to drive continuous improvement.",
+  timeline: "Track quality-related activities, interactions, and milestones to identify trends and areas requiring attention."
+  },
+  {
+  name: "Training",
+  narrator: "Develop and deliver training programs to employees, equipping them with the knowledge and skills necessary to excel in their roles.",
+  designer: "Create visually appealing instructional materials, such as presentations, guides, and videos, to engage learners and support knowledge retention.",
+  mechanics: "Introduce mechanics for learning management, skill assessment, and course evaluation to optimize training effectiveness.",
+  timeline: "Track employee progress, interactions, and milestones throughout the training process to provide tailored support and monitor learning outcomes."
+  },
+  {
+  name: "Training",
+  narrator: "Develop and deliver training programs to employees, equipping them with the knowledge and skills necessary to excel in their roles.",
+  designer: "Create visually appealing instructional materials, such as presentations, guides, and videos, to engage learners and support knowledge retention.",
+  mechanics: "Introduce mechanics for learning management, skill assessment, and course evaluation to optimize training effectiveness.",
+  timeline: "Track employee progress, interactions, and milestones throughout the training process to provide tailored support and monitor learning outcomes."
+  },
+  {
+  name: "Developer",
+  narrator: "Design, develop, and maintain software applications, ensuring they meet user needs and adhere to best practices in programming and user experience.",
+  designer: "Create visually appealing resources, such as wireframes, mockups, and prototypes, to facilitate software design and development.",
+  mechanics: "Introduce mechanics for project management, version control, and bug tracking to optimize software development workflows.",
+  timeline: "Track development activities, milestones, and releases to monitor progress and maintain alignment with project goals."
+  },
+  {
+  name: "CTO",
+  narrator: "Provide strategic leadership and oversight of an organization's technology initiatives, ensuring they align with business goals and drive innovation.",
+  designer: "Create visually appealing resources, such as roadmaps, architectural diagrams, and presentations, to communicate technology strategy and progress.",
+  mechanics: "Introduce mechanics for technology evaluation, adoption, and governance to support informed decision-making and risk management.",
+  timeline: "Track technology-related activities, milestones, and achievements to monitor progress and ensure alignment with business objectives."
+  },
+  {
+    name: "AI-Powered Life Coach",
+    narrator: "Provide personalized life coaching and support, using advanced AI techniques to help individuals overcome challenges, achieve goals, and unlock their full potential.",
+    designer: "Create visually appealing resources, such as progress trackers and motivational images, to inspire and empower individuals on their personal growth journey.",
+    mechanics: "Introduce mechanics for goal setting, habit formation, and emotional intelligence to facilitate holistic personal development.",
+    timeline: "Track individual progress, milestones, and breakthroughs to provide tailored support and celebrate achievements."
+  }
+]
+
+
 
 function narratorAI(prompt,gameState,sheet,scriptProperties)
 {
@@ -8,11 +285,29 @@ function narratorAI(prompt,gameState,sheet,scriptProperties)
   // Get the hidden mechanics information
   gameState = mechanicsAI(prompt,gameState,sheet,scriptProperties)
   // Add the mechanic information to the prompt and push it to the narrator
-  var narrator = []
-  narrator.push({"role":"system","content":"You are a game master for a " +scriptProperties.getProperty("mode") +" called " +gameState.game.name+". Focus on giving the player a chance for input. Use hidden skill checks, dice rolls, and have combat. The player can die and has limited inventory."}
-                ,{"role": "user", "content": "Load my story, scene, and game mechanics details."}
-                ,{"role": "assistant", "content": "Story: " + gameState.game.summary + "\nScene: " + gameState.game.scene + "\nMechanic: " + gameState.game.mechanic}
-                ,{"role": "user", "content":"Describe the next short scene in detail as if you were the narrator for a " +scriptProperties.getProperty("mode") +" letting me choose my next actions and reactions for the scene. User Input: " + prompt})
+  var narrator = [
+    {
+      role: "system",
+      content: `You are the narrator for a ${persona.name} experience. ${persona.narrator}`
+    },
+    { role: "user", content: "Load my story, scene, and mechanics details." },
+    {
+      role: "assistant",
+      content:`
+        Story: ${gameState.game.summary}\n
+        Scene: ${currentScene}\n
+        Mechanic: ${persona.mechanics}
+      `
+    },
+    {
+      role: "user",
+      content:
+        "Describe the next short scene in detail as if you were the narrator for a " +
+        persona.name +
+        " experience, allowing me to choose my next actions and reactions for the scene. User Input: " +
+        prompt
+    }
+  ];
   // Send the prompt with the hidden mechanics information
   Logger.log("NarratorAI")
   var description = sendPrompt(narrator,1.2,.4)
@@ -25,11 +320,29 @@ function narratorAI(prompt,gameState,sheet,scriptProperties)
 
 function mechanicsAI(prompt, gameState, sheet,scriptProperties)
 {
-  var mechanic = []
-  mechanic.push({"role":"system","content":"You are a subsystem that tracks inventory, status, and rules for a " +scriptProperties.getProperty("mode") +" called" +gameState.game.name+". You will respond with details about inventory and suggests probabilities for the scene."}
-                ,{"role": "user", "content": "Load my story, scene, and game mechanics details."}
-                ,{"role": "assistant", "content": "Story: " + gameState.game.summary + "\nScene: " + gameState.game.scene + "\nMechanic: " + gameState.game.mechanic}
-                ,{"role": "user", "content": "Please list out the inventory (with properties) and any objects of import in the scene. List a few probabilities of how things could go wrong or right based upon the players following actions. Player Input: " + prompt})
+  var mechanic = [
+    {
+      role: "system",
+      content:`You are a subsystem that tracks and manages mechanics for a ${persona.name} experience. ${persona.mechanics}`
+    },
+    { role: "user", content: "Load my story, scene, and mechanics details." },
+    {
+      role: "assistant",
+      content:`
+        Story: ${gameState.game.summary}\n
+        Scene: ${currentScene}\n
+        Mechanic: ${persona.mechanics}
+      `
+    },
+    {
+      role: "user",
+      content:`
+        Please provide relevant details based on the mechanics of this  ${persona.name} experience, and suggest possible outcomes or scenarios based on the user's input.\n
+        User Input:  ${prompt}
+      `
+    }
+  ];
+
   Logger.log("mechanicsAI")
   var response = sendPrompt(mechanic,.7,-.2)
   postMechanics(response,gameState,sheet)
@@ -41,12 +354,26 @@ function mechanicsAI(prompt, gameState, sheet,scriptProperties)
 
 function designerAI(prompt,gameState,sheet,rowImage,rowDescription,scriptProperties,skipPaint)
 {
-  var designer = []
-  designer.push({"role":"system","content":"You are video game designer in charge of creating art for a " +scriptProperties.getProperty("mode") +" called " +gameState.game.name+". Your job is is to assist the narrator by creating prompts for AI created images. Try to keep the style consistent for the game. Don't let prompts fail because of censorship."}
-    ,{"role": "user", "content": "Load my story timeline so far."}
-    ,{"role": "assistant", "content": gameState.game.summary}
-    ,{"role": "user", "content": "Please create one description that can be used by AI (Dalle API) to generate an image. Destill the esences of the following scene into a single image and make it visually interesting. \nScene:" + prompt})
-  Logger.log("DesignerAI")
+  var designer = [
+    {
+      role: "system",
+      content:`You are a designer in charge of creating art for a ${persona.name} experience. Your job is to assist the narrator by creating prompts for AI-generated images using the DALLE API. Try to keep the style consistent and avoid censorship issues.`
+    },
+    { role: "user", content: "Load my story and current scene." },
+    {
+      role: "assistant",
+      content:`
+        Story: ${gameState.game.summary}\n
+        Current Scene: ${currentScene}
+      `
+    },
+    {
+      role: "user",
+      content:`Please create a concise and evocative description that can be used by the DALLE API to generate an image that captures the essence of the following scene while considering the specific context and characteristics of the ${persona.name} experience. Ensure the image prompt is visually interesting and relevant to the user.\n
+        Scene: ${prompt}
+      `
+    }
+  ];
   var description = sendPrompt(designer,.6,-.1,)
   // var description = ""
   if (skipPaint != 1 )
@@ -76,11 +403,23 @@ function designerAI(prompt,gameState,sheet,rowImage,rowDescription,scriptPropert
 function timelineAI(gameState,sheet,scriptProperties)
 {
   // Check gameState story length,
-  const timeline = []
-  timeline.push({"role":"system","content":"You are the timeline bot. Your job is to track and the timeline of the story so far in " +gameState.game.name+". You will be used to generate the timeline that the other bots will use to craft the next scene."}
-                ,{"role": "user", "content": "Load my story, scene, and game mechanics details."}
-                ,{"role": "assistant", "content": "Story: " + gameState.game.summary + "\nScene: " + gameState.game.scene}
-                ,{"role": "user", "content": "Please provide a short timeline of my story events so far. With a brief summary of the story setting."})
+  const timeline = [
+    {
+      role: "system",
+      content: `You are the timeline bot. Your job is to track the timeline of the story or events so far in ${gameState.game.name}, considering the specific context of the ${persona.name} experience. You will be used to generate the timeline that the other bots will use to craft the next scene or interaction.`
+    },
+    { role: "user", content: "Load my story or events, and scene." },
+    {
+      role: "assistant",
+      content: `
+      Story or Events: ${gameState.game.summary}\n
+      Scene or Interaction: ${gameState.game.scene}`
+    },
+    {
+      role: "user",
+      content: `Please provide a short timeline of my story or events so far, considering the context of the ${persona.name} experience. Include a brief summary of the story setting or situation.`
+    }
+  ];
   Logger.log("TimelineAI")
   gameState.game.summary = sendPrompt(timeline,1.2,.4)
   postGameState(gameState,sheet)
