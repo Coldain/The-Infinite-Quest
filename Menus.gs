@@ -14,27 +14,20 @@ Pen & Paper RPG: Include skill checks, ability scores, and character sheets to e
 
 */
 
-// function menuIntialize() 
-// {
-//   var ui = SpreadsheetApp.getUi();
-//   var gameMenu = ui.createMenu('Text RPG')
-//   gameMenu.addItem("New Game", 'menuNewGame').addItem("Play", 'menuPlay').addItem("Suggestions", 'menuSuggestions');
-//   gameMenu.addSubMenu(ui.createMenu("Redo").addItem("Prompt", 'menuRedoPrompt').addItem("Scene", 'menuRedoScene').addItem("Prompt Image", 'menuRedoPromptImage').addItem("Scene Image", 'menuRedoSceneImage'));
-//   gameMenu.addSubMenu(ui.createMenu("Game Type").addItem("Text-Based RPG", 'menuTextRPG').addItem("Pen & Paper RPG", 'menuPenRPG').addItem("Choose your own adventure book", 'menuAdventureBook').addItem("point & click-esq game", 'menuClickGame').addItem("table top rpg", 'menuTableRPG').addItem("custom", 'menuModeCustom'));
-//   gameMenu.addSubMenu(ui.createMenu("Art Style").addItem("DOS", 'menuDOS').addItem("Super Nintendo", 'menuSNES').addItem("Playstation One", 'menuPS1').addItem("Modern Video Game", 'menuModern').addItem("Pixel Art", 'menuPixel').addItem("Ink", 'menuInk').addItem("custom", 'menuStyleCustom'));
+function menuIntialize() 
+{
+  var ui = SpreadsheetApp.getUi();
+  var gameMenu = ui.createMenu('🕺🏼GPT🤖')
+    gameMenu.addItem("🗣 Open Dialogue","showDialogue")
+  // gameMenu.addItem("New Game", 'menuNewGame').addItem("Play", 'menuPlay').addItem("Suggestions", 'menuSuggestions');
+  // gameMenu.addSubMenu(ui.createMenu("Redo").addItem("Prompt", 'menuRedoPrompt').addItem("Scene", 'menuRedoScene').addItem("Prompt Image", 'menuRedoPromptImage').addItem("Scene Image", 'menuRedoSceneImage'));
+  // gameMenu.addSubMenu(ui.createMenu("Game Type").addItem("Text-Based RPG", 'menuTextRPG').addItem("Pen & Paper RPG", 'menuPenRPG').addItem("Choose your own adventure book", 'menuAdventureBook').addItem("point & click-esq game", 'menuClickGame').addItem("table top rpg", 'menuTableRPG').addItem("custom", 'menuModeCustom'));
+  // gameMenu.addSubMenu(ui.createMenu("Art Style").addItem("DOS", 'menuDOS').addItem("Super Nintendo", 'menuSNES').addItem("Playstation One", 'menuPS1').addItem("Modern Video Game", 'menuModern').addItem("Pixel Art", 'menuPixel').addItem("Ink", 'menuInk').addItem("custom", 'menuStyleCustom'));
 
-//   //.addItem("Time Fracture", 'menuTimeFracture')
-//   gameMenu.addToUi();
-//   menuPlay()
-// }
-
-function menuIntialize() {
-  var htmlOutput = HtmlService.createHtmlOutputFromFile('gameDialogue.html')
-    .setWidth(800)
-    .setHeight(600);
-  SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Text RPG');
+  //.addItem("Time Fracture", 'menuTimeFracture')
+  gameMenu.addToUi();
+  // menuPlay()
 }
-
 
 function menuSuggestions()
 {
