@@ -114,7 +114,7 @@ function sendPrompt(prompt, chaos, frequency_penalty)
   }
 }
 
-function sendDescription(prompt,scriptProperties) 
+function sendDescription(prompt,scriptProperties,gameState) 
 {
   try
   {
@@ -129,7 +129,7 @@ function sendDescription(prompt,scriptProperties)
     // Adjust payload and endpoint
     var endpoint = baseUri + "/images/generations";
     var payload = {}
-    payload.prompt = "Generate a detailed and intricate images, in the style of " +scriptProperties.getProperty("style") +" art. For a " +scriptProperties.getProperty("modeDescription") +". Based following story. \nStory:" + prompt.substring(0,900) + "."
+    payload.prompt = "Generate a detailed and intricate images, in the style of " +scriptProperties.getProperty("style") +" art. For a " +scriptProperties.getProperty("mode") +" called " +gameState.game.name+". Based following story. \nStory:" + prompt.substring(0,900) + "."
     payload.n = 1
     payload.size = "512x512"
                   

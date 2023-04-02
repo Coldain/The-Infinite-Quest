@@ -3,6 +3,7 @@ function menuIntialize()
   var ui = SpreadsheetApp.getUi();
   var gameMenu = ui.createMenu('Text RPG')
   gameMenu.addItem("New Game", 'menuNewGame').addItem("Play", 'menuPlay').addItem("Suggestions", 'menuSuggestions');
+  gameMenu.addSubMenu(ui.createMenu("Redo").addItem("Prompt", 'menuRedoPrompt').addItem("Scene", 'menuRedoScene').addItem("Prompt Image", 'menuRedoPromptImage').addItem("Scene Image", 'menuRedoSceneImage'));
   gameMenu.addSubMenu(ui.createMenu("Game Type").addItem("Text-Based RPG", 'menuTextRPG').addItem("Pen & Paper RPG", 'menuPenRPG').addItem("Choose your own adventure book", 'menuAdventureBook').addItem("point & click-esq game", 'menuClickGame').addItem("table top rpg", 'menuTableRPG').addItem("custom", 'menuModeCustom'));
   gameMenu.addSubMenu(ui.createMenu("Art Style").addItem("DOS", 'menuDOS').addItem("Super Nintendo", 'menuSNES').addItem("Playstation One", 'menuPS1').addItem("Modern Video Game", 'menuModern').addItem("Pixel Art", 'menuPixel').addItem("Ink", 'menuInk').addItem("custom", 'menuStyleCustom'));
 
@@ -91,10 +92,10 @@ function menuPlay(testing,sytleReview)
     spreadsheet.setActiveSheet(spreadsheet.getSheetByName("ImageTest4"), true);
     sheet = spreadsheet.getSheetByName("ImageTest4")
   }
-  Logger.log("Current Game: " + spreadsheet.getActiveSheet().getSheetName())
+  Logger.log("Current Game: " + spreadsheet.getActiveSheet().getSheetName()+"\nMode: "+scriptProperties.getProperty("mode")+ "\nStyle: "+scriptProperties.getProperty("style"))
   var gameState = getGameState(sheet)
   Logger.log({gameState})
-  if (sytleReview = 1)
+  if (sytleReview == 1)
   {
     var description = gameState.game.scene
     var prompt = gameState.game.prompt
@@ -114,7 +115,7 @@ function menuPlay(testing,sytleReview)
     description = getDescription(gameState,sheet)
   }
 
-  if (sytleReview = 1)
+  if (sytleReview == 1)
   {
     if (gameState.game.activeColumn >= 4)
     {
@@ -291,8 +292,7 @@ function menuStyleCustom()
 {
   var ui = SpreadsheetApp.getUi();
   var result = ui.prompt(
-    description,
-    'The type of game you want the system to try and emulate.',
+    'Please enter the style of art you want the system to try and emulate.',
     ui.ButtonSet.OK_CANCEL);
   // Process the user's response.
   var button = result.getSelectedButton();
@@ -306,8 +306,7 @@ function menuModeCustom()
 {
   var ui = SpreadsheetApp.getUi();
   var result = ui.prompt(
-    description,
-    'Please enter the style of art you want the system to try and emulate.',
+    'The type of game you want the system to try and emulate.',
     ui.ButtonSet.OK_CANCEL);
   // Process the user's response.
   var button = result.getSelectedButton();
@@ -316,4 +315,92 @@ function menuModeCustom()
   {
     menuModeSetting(text)
   }
+}
+
+function menuRedoPromptImage()
+{
+  var ui = SpreadsheetApp.getUi();
+  ui.alert("Not Implemented Yet")
+}
+function menuRedoPromptImage()
+{
+  var ui = SpreadsheetApp.getUi();
+  ui.alert("Not Implemented Yet")
+}
+function menuRedoPromptImage()
+{
+  var ui = SpreadsheetApp.getUi();
+  var spreadsheet = SpreadsheetApp.getActive();
+  var scriptProperties = PropertiesService.getScriptProperties()
+  if (scriptProperties.getProperty("mode") == null)
+  {
+    menuModeSetting()
+  }
+  if (scriptProperties.getProperty("style") == null)
+  {
+    menuStyleSetting()
+  }
+  var sheet = spreadsheet.getActiveSheet()
+  var sheetName = sheet.getSheetName()
+  if (sheetName == "Instructions" || sheetName == "New Game")
+  {  
+    // Insert UI to select from sheets
+    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("ImageTest4"), true);
+    sheet = spreadsheet.getSheetByName("ImageTest4")
+  }
+  var gameState = getGameState(sheet)
+  var result = ui.prompt(
+      'Which Column would you like to do this for?:',
+      ui.ButtonSet.OK_CANCEL);
+  var text = result.getResponseText();
+  try
+  {
+    parseInt(text) 
+    gameState.game.activeColumn = text
+  }
+  catch
+  {
+    throw new Error("Must be a number but recieved " +text)
+  }
+  draw(sheet.getRange(getRowPromptImagery(),gameState.game.activeColumn).getValue(),getRowPromptImage(),gameState,scriptProperties,sheet)
+  
+  
+}
+function menuRedoSceneImage()
+{
+  // var ui = SpreadsheetApp.getUi();
+  var spreadsheet = SpreadsheetApp.getActive();
+  var scriptProperties = PropertiesService.getScriptProperties()
+  if (scriptProperties.getProperty("mode") == null)
+  {
+    menuModeSetting()
+  }
+  if (scriptProperties.getProperty("style") == null)
+  {
+    menuStyleSetting()
+  }
+  var sheet = spreadsheet.getActiveSheet()
+  var sheetName = sheet.getSheetName()
+  if (sheetName == "Instructions" || sheetName == "New Game")
+  {  
+    // Insert UI to select from sheets
+    spreadsheet.setActiveSheet(spreadsheet.getSheetByName("ImageTest4"), true);
+    sheet = spreadsheet.getSheetByName("ImageTest4")
+  }
+  var gameState = getGameState(sheet)
+  // var result = ui.prompt(
+  //     'Which Column would you like to do this for?:',
+  //     ui.ButtonSet.OK_CANCEL);
+  // var text = result.getResponseText();
+  var text = 4
+  try
+  {
+    text = parseInt(text) 
+    gameState.game.activeColumn = text
+  }
+  catch
+  {
+    throw new Error("Must be a number but recieved " +text)
+  }
+  draw(sheet.getRange(getRowSceneImagery(),gameState.game.activeColumn).getValue(),getRowSceneImage(),gameState,scriptProperties,sheet)
 }

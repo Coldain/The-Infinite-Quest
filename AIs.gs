@@ -105,7 +105,7 @@ function designerAI(prompt,gameState,sheet,rowImage,rowDescription,scriptPropert
     sheet.getRange(rowDescription,gameState.game.activeColumn).setValue(description)
     try
     {
-      var imageURL = sendDescription(description,scriptProperties)
+      var imageURL = sendDescription(description,scriptProperties,gameState)
       var fileID = downloadFile(imageURL)
       var inlineURL = "https://drive.google.com/uc?export=download&id="+fileID
       sheet.getRange(rowImage,gameState.game.activeColumn).setValue('=IMAGE("'+inlineURL+'")')
@@ -442,7 +442,7 @@ function draw(description,rowImage,gameState,scriptProperties,sheet)
 {
   try
     {
-      var imageURL = sendDescription(description,scriptProperties)
+      var imageURL = sendDescription(description,scriptProperties,gameState)
       var fileID = downloadFile(imageURL)
       var inlineURL = "https://drive.google.com/uc?export=download&id="+fileID
       sheet.getRange(rowImage,gameState.game.activeColumn).setValue('=IMAGE("'+inlineURL+'")')
