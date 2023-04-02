@@ -1,16 +1,40 @@
-function menuIntialize() 
-{
-  var ui = SpreadsheetApp.getUi();
-  var gameMenu = ui.createMenu('Text RPG')
-  gameMenu.addItem("New Game", 'menuNewGame').addItem("Play", 'menuPlay').addItem("Suggestions", 'menuSuggestions');
-  gameMenu.addSubMenu(ui.createMenu("Redo").addItem("Prompt", 'menuRedoPrompt').addItem("Scene", 'menuRedoScene').addItem("Prompt Image", 'menuRedoPromptImage').addItem("Scene Image", 'menuRedoSceneImage'));
-  gameMenu.addSubMenu(ui.createMenu("Game Type").addItem("Text-Based RPG", 'menuTextRPG').addItem("Pen & Paper RPG", 'menuPenRPG').addItem("Choose your own adventure book", 'menuAdventureBook').addItem("point & click-esq game", 'menuClickGame').addItem("table top rpg", 'menuTableRPG').addItem("custom", 'menuModeCustom'));
-  gameMenu.addSubMenu(ui.createMenu("Art Style").addItem("DOS", 'menuDOS').addItem("Super Nintendo", 'menuSNES').addItem("Playstation One", 'menuPS1').addItem("Modern Video Game", 'menuModern').addItem("Pixel Art", 'menuPixel').addItem("Ink", 'menuInk').addItem("custom", 'menuStyleCustom'));
+/*
+// I've got a choose your on adventure text based rpg system in google sheets using app script. I'd like to make improvements to the code, user experience, and UI with HTML interfaces (a modal and maybe a sidebar).
 
-  //.addItem("Time Fracture", 'menuTimeFracture')
-  gameMenu.addToUi();
-  menuPlay()
+// Here's some of my menu script. I'm positive we can better optimize this, making the code much smaller, easier to read, reduce extra code, modularize things, etc.
+---
+I've got a choose your on adventure text based rpg system in google sheets using app script. Here's some of my menu script.
+---
+Can I get this to all be contain in 1 menu that just pops up an HTML with these as options and a game window? Could you help me describe and outline this?
+---
+Could you help me with the game options, what would some of that section look like and maybe the related <script> and .gs I didn't have the actual impact of the game style or art style in (they were commented out) but here's some examples that I want to do now.
+
+Text-Based RPG: Introduce text commands for players to interact with the environment, solve puzzles, or engage in combat.
+Pen & Paper RPG: Include skill checks, ability scores, and character sheets to emulate the experience of a traditional tabletop RPG.
+
+*/
+
+// function menuIntialize() 
+// {
+//   var ui = SpreadsheetApp.getUi();
+//   var gameMenu = ui.createMenu('Text RPG')
+//   gameMenu.addItem("New Game", 'menuNewGame').addItem("Play", 'menuPlay').addItem("Suggestions", 'menuSuggestions');
+//   gameMenu.addSubMenu(ui.createMenu("Redo").addItem("Prompt", 'menuRedoPrompt').addItem("Scene", 'menuRedoScene').addItem("Prompt Image", 'menuRedoPromptImage').addItem("Scene Image", 'menuRedoSceneImage'));
+//   gameMenu.addSubMenu(ui.createMenu("Game Type").addItem("Text-Based RPG", 'menuTextRPG').addItem("Pen & Paper RPG", 'menuPenRPG').addItem("Choose your own adventure book", 'menuAdventureBook').addItem("point & click-esq game", 'menuClickGame').addItem("table top rpg", 'menuTableRPG').addItem("custom", 'menuModeCustom'));
+//   gameMenu.addSubMenu(ui.createMenu("Art Style").addItem("DOS", 'menuDOS').addItem("Super Nintendo", 'menuSNES').addItem("Playstation One", 'menuPS1').addItem("Modern Video Game", 'menuModern').addItem("Pixel Art", 'menuPixel').addItem("Ink", 'menuInk').addItem("custom", 'menuStyleCustom'));
+
+//   //.addItem("Time Fracture", 'menuTimeFracture')
+//   gameMenu.addToUi();
+//   menuPlay()
+// }
+
+function menuIntialize() {
+  var htmlOutput = HtmlService.createHtmlOutputFromFile('gameDialog.html')
+    .setWidth(800)
+    .setHeight(600);
+  SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Text RPG');
 }
+
 
 function menuSuggestions()
 {
