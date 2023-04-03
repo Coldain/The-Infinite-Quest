@@ -4,105 +4,181 @@
     <base target="_top">
     <style>
       /* Add any custom styles for your dialog here */
+      .selected-game-type {
+        display: inline-block;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .game-type-options {
+        display: none;
+        position: absolute;
+        z-index: 1;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        cursor: default;
+        padding: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .game-type-option {
+        margin: 5px 0;
+        cursor: pointer;
+      }
+
+      .game-type-option:hover {
+        background-color: #eee;
+      }
+
+      .game-type-tooltip {
+        position: absolute;
+        z-index: 2;
+        display: none;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        padding: 5px;
+        max-width: 300px;
+        text-align: left;
+      }
+      .game-type-option:hover + .game-type-tooltip,
+      .selected-game-type:hover + .game-type-tooltip {
+        display: block;
+      }
     </style>
   </head>
   <body>
     <h1>Text RPG</h1>
     <div id="gameOptions">
       <h2>Game Type</h2>
-      <select id="gameTypeSelect" onchange="showNarratorInfo()">
-        <!-- Options will be added dynamically -->
-      </select>
-      <div id="narratorInfo"></div>
-      <!-- ... -->
+      <div class="selected-game-type" onclick="toggleGameTypeOptions()" id="currentGameTypeBtn">
+        <!-- Display the selected game type here -->
+        <div id="selectedGameType"></div>
+      </div>
+      <div class="game-type-options" onmouseleave="hideGameTypeOptions()" id="gameOptionsContainer">
+        <!-- Display the game type options here -->
+        <div id="gameTypeOptions"></div>
+      </div>
     </div>
     <button id="newGameBtn">New Game</button>
     <button id="loadGameBtn">Load Game</button>
     <button id="splitTimelineBtn">Split Timeline</button>
 
     <div id="gameWindow">
-      <!-- Add a container for the game window where the game content will be displayed -->
+      <h2>Game State</h2>
+      <div id="gameStateDisplay"></div>
+      <h2>Scene</h2>
+      <div id="sceneDisplay"></div>
+      <h2>Image</h2>
+      <div id="imageDisplay"></div>
+      <h2>Response</h2>
+      <textarea id="responseInput"></textarea>
+      <button id="submitResponseBtn">Submit</button>
     </div>
     <script>
-      // Add JavaScript functions to handle button clicks and other interactions
-      function applyGameOptions() {
-        var gameType = document.querySelector('input[name="gameType"]:checked').value;
-        google.script.run.setGameType(gameType);
+      document.addEventListener("DOMContentLoaded", function () {
+        loadLastGame();
+        // Call displayGameState when the dialog is loaded
+        google.script.run.withSuccessHandler(displayGameState).getGameState();
+      });
+
+      function loadLastGame() {
+        google.script.run.withSuccessHandler(displayLastGame).loadLastGame();
       }
 
-      function loadGameOptions() {
-        google.script.run.withSuccessHandler(populateGameTypeOptions).getPersonas();
+      function displayLastGame(gameName) {
+        document.getElementById("currentGameTypeBtn").textContent = gameName;
       }
 
-      function populateGameTypeOptions(personas) {
-        var select = document.getElementById("gameTypeSelect");
-        personas.forEach(function (persona, index) {
-          var option = document.createElement("option");
-          option.value = index;
-          option.textContent = persona.name;
-          select.appendChild(option);
-        });
-        showNarratorInfo();
+      function toggleGameTypeOptions() {
+        const gameOptions = document.getElementById("gameOptionsContainer");
+        if (gameOptions.style.display === "none") {
+          gameOptions.style.display = "block";
+          showGameOptions();
+        } else {
+          gameOptions.style.display = "none";
+        }
       }
 
-      // Call loadGameOptions when the dialog is loaded
-      document.addEventListener("DOMContentLoaded", loadGameOptions);
+      function hideGameTypeOptions() {
+        document.getElementById("gameOptionsContainer").style.display = "none";
+      }
 
-      function showNarratorInfo() {
-          var select = document.getElementById("gameTypeSelect");
-          var selectedIndex = select.value;
-          google.script.run.withSuccessHandler(function (personas) {
-            var narratorInfo = document.getElementById("narratorInfo");
-            narratorInfo.textContent = personas[selectedIndex].narrator;
-          }).getPersonas();
+      function loadGameTypeOptions() {
+        google.script.run.withSuccessHandler(function(gameList) {
+        const gameTypeOptions = document.getElementById("gameTypeOptions");
+        gameList.forEach(function(gameName) {
+          const gameOption = document.createElement("div");
+          gameOption.classList.add("game-type-option");
+          gameOption.textContent = gameName;
+          gameOption.onclick = function() {
+            setGameType(gameName);
+          };
+          gameTypeOptions.appendChild(gameOption);
+        });
+      }).getGameList();
+
+    // Add click event listeners to the buttons
+      document.getElementById("newGameBtn").addEventListener("click", newGame);
+      document.getElementById("loadGameBtn").addEventListener("click", loadGame);
+      document.getElementById("splitTimelineBtn").addEventListener("click", splitTimeline);
+
+      function newGame() {
+        // Call the menuNewGame function from the server-side script
+        google.script.run.menuNewGame();
+      }
+
+      function loadGame() {
+        // Prompt the user to select a game to load
+        google.script.run.withSuccessHandler(promptLoadGame).getGameList();
+      }
+
+      function promptLoadGame(gameList) {
+        var gameName = prompt("Please enter the name of the game you want to load:", "");
+        if (gameName !== null && gameName !== "") {
+          if (gameList.includes(gameName)) {
+            google.script.run.loadGameByName(gameName);
+          } else {
+            alert("Game not found! Please enter a valid game name.");
+            loadGame();
+          }
+        }
+      }
+
+      // Add code to display the game state in the UI
+        function displayGameState(gameState) {
+          var gameStateDisplay = document.getElementById("gameStateDisplay");
+          gameStateDisplay.textContent = JSON.stringify(gameState, null, 2);
+          
+          var sceneDisplay = document.getElementById("sceneDisplay");
+          sceneDisplay.textContent = gameState.game.scene;
+          
+          var imageDisplay = document.getElementById("imageDisplay");
+          imageDisplay.innerHTML = "<img src='" + gameState.game.image[0] + "'>";
         }
 
-        // Add event listeners for hover and focus events
-        document.getElementById("gameTypeSelect").addEventListener("mouseover", function (event) {
-          if (event.target.tagName === "OPTION") {
-            event.target.parentNode.value = event.target.value;
-            showNarratorInfo();
-          }
+        // Call the displayGameState function with the game state when the dialog is loaded
+        document.addEventListener("DOMContentLoaded", function () {
+          google.script.run.withSuccessHandler(displayGameState).getGameState();
         });
 
-        document.getElementById("gameTypeSelect").addEventListener("mouseout", function (event) {
-          if (event.target.tagName === "OPTION") {
-            showNarratorInfo();
-          }
-        });
+        // Add event listener for the submit response button
+        document.getElementById("submitResponseBtn").addEventListener("click", submitResponse);
 
-        // Add click event listeners to the buttons
-        document.getElementById("newGameBtn").addEventListener("click", newGame);
-        document.getElementById("loadGameBtn").addEventListener("click", loadGame);
-        document.getElementById("splitTimelineBtn").addEventListener("click", splitTimeline);
-
-        function newGame() {
-          // Call the menuNewGame function from the server-side script
-          google.script.run.menuNewGame();
-        }
-
-        function loadGame() {
-          // Prompt the user to select a game to load
-          google.script.run.withSuccessHandler(promptLoadGame).getGameList();
-        }
-
-        function promptLoadGame(gameList) {
-          var gameName = prompt("Please enter the name of the game you want to load:", "");
-          if (gameName !== null && gameName !== "") {
-            if (gameList.includes(gameName)) {
-              google.script.run.loadGameByName(gameName);
-            } else {
-              alert("Game not found! Please enter a valid game name.");
-              loadGame();
-            }
-          }
-        }
-
-        function splitTimeline() {
-          // Call the splitTimeline function from the server-side script (you'll need to implement this)
-          google.script.run.splitTimeline();
+        function submitResponse() {
+          var responseInput = document.getElementById("responseInput");
+          var response = responseInput.value;
+          google.script.run.submitResponse(response);
+          responseInput.value = "";
         }
 
     </script>
   </body>
 </html>
+

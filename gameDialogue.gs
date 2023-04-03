@@ -7,7 +7,6 @@ function setGameType(gameType) {
   scriptProperties.setProperty("gameType", gameType);
 }
 
-
 function showDialogue() {
   var htmlOutput = HtmlService.createHtmlOutputFromFile('gameDialogue_UI.html')
     .setWidth(800)
@@ -27,6 +26,12 @@ function loadGameByName(gameName) {
   }
 }
 
+function loadLastGame() {
+  var scriptProperties = PropertiesService.getScriptProperties();
+  var gameName = scriptProperties.getProperty("gameType");
+  return gameName;
+}
+
 function getGameList() {
   var spreadsheet = SpreadsheetApp.getActive();
   var sheets = spreadsheet.getSheets();
@@ -40,4 +45,8 @@ function getGameList() {
   });
 
   return gameList;
+}
+
+function getGameState() {
+  // Add the necessary code to return the game state
 }

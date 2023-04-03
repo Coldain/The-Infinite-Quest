@@ -8,7 +8,7 @@ const personas = [
   },
   {
     name: "Choose Your Own Adventure Book",
-    narrator: "Use descriptive language that evokes the feeling of reading a book, Incorporate branching storylines and numbered passages that the player can 'turn' to based on their choices",
+    narrator: "Use descriptive language that evokes the feeling of reading a book, Incorporate branching storylines and numbered passages that the player can 'turn' to based on their choices. Present as if the user is reading from a book. List out page numbers for options. Don't reveal the consequences or details of these pages.",
     designer: "The designer bot can create images that resemble book illustrations, with a focus on important scenes, characters, or objects that the player encounters. The image style can be reminiscent of classic choose your own adventure book illustrations.",
     mechanics: "Use systems that a book could incorporate such as a random table from the back of the book. Writing down inventory items character advancement and ailments,",
     timeline: "The timeline bot can summarize the story events as a sequence of choices and their outcomes, similar to a path taken through a choose your own adventure book.",
@@ -435,10 +435,13 @@ const personas = [
   }
 ]
 
-
+function loadPersona(name) {
+  return matchingPersona = personas.find(persona => persona.name === name);
+}
 
 function narratorAI(prompt,gameState,sheet,scriptProperties)
 {
+  const persona = loadPersona(scriptProperties.getProperty("mode"));
   // this will take input from the timelineAI and user input to generate the next scene
   postPrompt(prompt,gameState,sheet)
   gameState = timelineAI(gameState,sheet,scriptProperties)
@@ -456,7 +459,7 @@ function narratorAI(prompt,gameState,sheet,scriptProperties)
       role: "assistant",
       content:`
         Story: ${gameState.game.summary}\n
-        Scene: ${currentScene}\n
+        Scene: ${gameState.game.scene}\n
         Mechanic: ${persona.mechanics}
       `
     },
@@ -481,6 +484,7 @@ function narratorAI(prompt,gameState,sheet,scriptProperties)
 
 function mechanicsAI(prompt, gameState, sheet,scriptProperties)
 {
+  const persona = loadPersona(scriptProperties.getProperty("mode"));
   var mechanic = [
     {
       role: "system",
@@ -491,14 +495,14 @@ function mechanicsAI(prompt, gameState, sheet,scriptProperties)
       role: "assistant",
       content:`
         Story: ${gameState.game.summary}\n
-        Scene: ${currentScene}\n
+        Scene: ${gameState.game.scene}\n
         Mechanic: ${persona.mechanics}
       `
     },
     {
       role: "user",
       content:`
-        Please provide relevant details based on the mechanics of this  ${persona.name} experience, and suggest possible outcomes or scenarios based on the user's input.\n
+        Please provide relevant details based on the mechanics of this  ${persona.name} experience, and suggest the system and probabilites that will drive the way in which the narrator will describe the repsonse to the user.\n
         User Input:  ${prompt}
       `
     }
@@ -515,6 +519,7 @@ function mechanicsAI(prompt, gameState, sheet,scriptProperties)
 
 function designerAI(prompt,gameState,sheet,rowImage,rowDescription,scriptProperties,skipPaint)
 {
+  const persona = loadPersona(scriptProperties.getProperty("mode"));
   var designer = [
     {
       role: "system",
@@ -525,7 +530,7 @@ function designerAI(prompt,gameState,sheet,rowImage,rowDescription,scriptPropert
       role: "assistant",
       content:`
         Story: ${gameState.game.summary}\n
-        Current Scene: ${currentScene}
+        Current Scene: ${gameState.game.scene}
       `
     },
     {
@@ -563,6 +568,7 @@ function designerAI(prompt,gameState,sheet,rowImage,rowDescription,scriptPropert
 
 function timelineAI(gameState,sheet,scriptProperties)
 {
+  const persona = loadPersona(scriptProperties.getProperty("mode"));
   // Check gameState story length,
   const timeline = [
     {
