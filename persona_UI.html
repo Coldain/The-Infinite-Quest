@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #e2551e;
+      }
+      h1 {
+        font-size: 24px;
+        color: #e2551e;
+      }
+      p {
+        font-size: 16px;
+      }
+      select, button {
+        background-color: #00a67d;
+        color: #fff;
+        border: 1px solid #00a67d;
+        cursor: pointer;
+        margin-top: 1rem;
+      }
+      #style-options {
+        display: grid;
+        grid-template-columns: min-content 1fr;
+        grid-auto-flow: row;
+        grid-gap: 0.5rem;
+        align-items: center;
+        color: #00a67d;
+      }
+
+      #style-options label {
+        display: flex;
+        align-items: center;
+      }
+      #style-options input[type="radio"] {
+        margin-right: 0.5rem;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Select a Persona</h1>
+      <select id="persona-select" onchange="updateSelectedPersona()">
+      </select>
+      <h1 id="persona-name"></h1>
+      <p id="narrator-message"></p>
+      <h1>Selected Style</h1>
+      <div id="style-options">
+      </div>
+      <button id="close-button">Play</button>
+    </div>
+    <script>
+
+      // Get all the personas and styles when the page loads
+      getAllPersonas();
+
+
+      function getAllPersonas() {
+        google.script.run
+          .withSuccessHandler(displayPersonas)
+          .getAllPersonas();
+      }
+
+      function displayPersonas(personas) {
+        const select = document.getElementById("persona-select");
+        personas.forEach(persona => {
+          const option = document.createElement("option");
+          option.value = persona.name;
+          option.innerText = persona.name;
+          option.title = persona.narrator;
+          select.appendChild(option);
+        });
+        getStoredSelectedPersona();
+      }
+
+      function getStoredSelectedPersona() {
+        google.script.run
+          .withSuccessHandler(selectStoredPersona)
+          .getSelectedPersona();
+      }
+
+      function selectStoredPersona(persona) {
+        if (persona) {
+          const select = document.getElementById("persona-select");
+          select.value = persona.name;
+          updateSelectedPersona();
+        }
+      }
+
+      function updateSelectedPersona() {
+        const select = document.getElementById("persona-select");
+        const name = select.value;
+        google.script.run
+          .withSuccessHandler(displaySelectedPersona)
+          .loadAndStorePersona(name);
+      }
+
+      function displaySelectedPersona(persona) {
+        document.getElementById("persona-name").innerText = persona.name;
+        document.getElementById("narrator-message").innerText = persona.narrator;
+        displayStyles(persona.styles);
+      }
+
+      function displayStyles(styles) {
+        const optionsDiv = document.getElementById("style-options");
+        optionsDiv.innerHTML = '';
+        styles.forEach((style, index) => {
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "style";
+          radio.value = style;
+          radio.id = "style-" + index;
+          radio.onchange = updateSelectedStyle;
+
+          const label = document.createElement("label");
+          label.htmlFor = "style-" + index;
+          label.innerText = style;
+
+          optionsDiv.appendChild(radio);
+          optionsDiv.appendChild(label);
+        });
+        getStoredSelectedStyle();
+      }
+
+      function getStoredSelectedStyle() {
+        google.script.run
+          .withSuccessHandler(selectStoredStyle)
+          .getSelectedStyle();
+      }
+
+      function selectStoredStyle(style) {
+        if (style) {
+          const radios = document.getElementsByName("style");
+          for (const radio of radios) {
+            if (radio.value === style) {
+              radio.checked = true;
+              break;
+            }
+          }
+        }
+      }
+
+      function updateSelectedStyle() {
+        const radios = document.getElementsByName("style");
+        for (const radio of radios) {
+          if (radio.checked) {
+            google.script.run.storeSelectedStyle(radio.value);
+            break;
+          }
+        }
+      }
+      document.getElementById("close-button").addEventListener("click", function() {
+        google.script.run.menuPlay();
+        setTimeout(function() {
+          google.script.host.close();
+        }, 200);
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat System</title>
+  <!-- Quill -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+  <!-- Prism -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/themes/prism.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+  <!-- Styles for chat box, messages, buttons, and other UI elements -->
+  <style type="text/css">
+    #chatbox {
+      border: 1px solid black;
+      padding: 10px;
+      overflow-y: scroll;
+      height: 300px;
+    }
+    .user-message {
+      background-color: #00a67d;
+      color: white;
+      padding: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      text-align: left;
+    }
+    .ai-message {
+      background-color: #e2551e;
+      color: white;
+      padding: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      text-align: left;
+    }
+    .timeline-message {
+      background-color: #c2c2c2;
+      padding: 5px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      text-align: left;
+    }
+    .copy-code-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.2);
+      color: white;
+      border: none;
+      padding: 2px 5px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .pre-container {
+      position: relative;
+      display: inline-block;
+    }
+    .pre-container:hover .copy-code-button {
+      opacity: 1;
+    }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #000;
+        color: #e2551e;
+      }
+      h1 {
+        font-size: 24px;
+        color: #e2551e;
+      }
+      p {
+        font-size: 16px;
+      }
+      select, button {
+        background-color: #00a67d;
+        color: #fff;
+        border: 1px solid #00a67d;
+        cursor: pointer;
+        margin-top: 1rem;
+      }
+      #style-options {
+        display: grid;
+        grid-template-columns: min-content 1fr;
+        grid-auto-flow: row;
+        grid-gap: 0.5rem;
+        align-items: center;
+        color: #00a67d;
+      }
+
+      #style-options label {
+        display: flex;
+        align-items: center;
+      }
+      #style-options input[type="radio"] {
+        margin-right: 0.5rem;
+      }
+      .parent {
+        width: 100%;
+      }
+
+      .child {
+        width: 50%;
+        float: left;
+      }
+
+      .typing-dots span {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin-left: 2px;
+        background-color: #e2551e;
+        border-radius: 50%;
+        animation: typing-dots 1s infinite;
+      }
+
+      .typing-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typing-dots {
+        0%, 80%, 100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-5px);
+        }
+      }
+
+  </style>
+</head>
+<body>
+  <!-- Game Area -->
+  <div id="game-area" class="parent">
+    <div id="input" class="child">
+      <!-- Main chat box container -->
+      <div id="chatbox">
+        <!-- Typing animation container -->
+        <div id="typing-animation" style="display: none;">
+          <strong>AI: </strong> <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
+        </div>
+      </div>
+      <!-- Quill toolbar for text formatting -->
+      <div id="toolbar">
+        <span class="ql-formats">
+          <select class="ql-header"></select>
+          <button class="ql-bold"></button>
+          <button class="ql-italic"></button>
+          <button class="ql-underline"></button>
+          <button class="ql-strike"></button>
+        </span>
+        <span class="ql-formats">
+          <select class="ql-color"></select>
+          <select class="ql-background"></select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-list" value="ordered"></button>
+          <button class="ql-list" value="bullet"></button>
+          <button class="ql-indent" value="-1"></button>
+          <button class="ql-indent" value="+1"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-link"></button>
+          <button class="ql-image"></button>
+          <button class="ql-video"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-clean"></button>
+        </span>
+      </div>
+      <!-- Quill editor container -->
+      <div id="editor" style="height: 100px;"></div>
+      <!-- Send button -->
+      <button onclick="sendMessage()">Send</button>
+    </div>
+    <div id="display-area" class="child">
+      <!-- Persona selection and style options -->
+      <div class="container">
+        <h1>Select a Persona</h1>
+        <select id="persona-select" onchange="updateSelectedPersona()">
+        </select>
+        <h1 id="persona-name"></h1>
+        <p id="narrator-message"></p>
+        <h1>Selected Style</h1>
+        <div id="style-options">
+        </div>
+        <button id="close-button">Update Persona</button>
+      </div>
+    </div>
+  </div>
+  <!-- Main script for handling chat messages, game state, and updating UI -->
+  <script type="text/javascript">
+  // Initialize Quill editor
+  const BlockEmbed = Quill.import('blots/block/embed');
+
+  const quill = new Quill('#editor', {
+    modules: {
+      toolbar: '#toolbar'
+    },
+    theme: 'snow'
+  });
+
+  // Initialize Prism
+  Prism.highlightAll();
+
+  document.addEventListener("DOMContentLoaded", function() {
+    loadInitialGameState();
+  });
+
+  function loadInitialGameState() {
+  google.script.run
+    .withSuccessHandler(function(response) {
+      updateChatUI(response);
+    })
+    .getGameStateHTML();
+  }
+
+  function sendMessage() {
+    var delta = quill.getContents(); // Get the Quill delta object
+    var message = delta.ops.map(op => op.insert).join(''); // Convert to plain text
+    var formattedMessage = quill.root.innerHTML; // Get the formatted HTML
+    quill.setContents([{ insert: '\n' }]); // Clear the editor
+
+    // Show typing animation
+    // document.getElementById("typing-animation").style.display = "block";
+
+    // Send the message to the server and update the chat UI
+    google.script.run
+    .withSuccessHandler(function(response) {
+      console.log("Success: Response received:", response);
+      updateChatUI(response);
+      // document.getElementById("typing-animation").style.display = "none";
+    })
+    .withFailureHandler(function(error) { // Add this block
+      console.error("Error:", error);
+      document.getElementById("typing-animation").style.display = "none";
+    })
+    .propmtHTML(formattedMessage);
+
+  }
+
+
+
+  function receiveMessage() {
+    var timestamp = new Date().toLocaleTimeString();
+    var aiResponse = "Sample AI response with <strong>bold</strong> and <em>italic</em> text.";
+    document.getElementById("chatbox").innerHTML += '<div class="ai-message"><strong>AI (' + timestamp + '): </strong>' + aiResponse + '</div>';
+  }
+
+  function updateChatUI(gameState) {
+    var chatbox = document.getElementById("chatbox");
+        chatbox.innerHTML = "";
+        messageDiv = '<div class="ai-message"><strong>Agent: </strong>' + gameState.game.scene + '<br><img src="' + gameState.game.sceneImage + '" alt="' + gameState.game.scenealt + '"></div>';
+      
+      chatbox.innerHTML += messageDiv;
+        messageDiv = '<div class="user-message"><strong>User: </strong>' + gameState.game.prompt + '<br><img src="' + gameState.game.promptImage + '" alt="' + gameState.game.promptalt + '"></div>';
+      
+      chatbox.innerHTML += messageDiv;
+        messageDiv = '<div class="timeline-message"><strong>Timeline: </strong>' + gameState.game.summary + '</div>';
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
+
+      // Get all the personas and styles when the page loads
+      getAllPersonas();
+
+      // Fetch all personas from the server-side
+      function getAllPersonas() {
+        google.script.run
+          .withSuccessHandler(displayPersonas)
+          .getAllPersonas();
+      }
+
+      // Display personas in the dropdown
+      function displayPersonas(personas) {
+        const select = document.getElementById("persona-select");
+        personas.forEach(persona => {
+          const option = document.createElement("option");
+          option.value = persona.name;
+          option.innerText = persona.name;
+          option.title = persona.narrator;
+          select.appendChild(option);
+        });
+        getStoredSelectedPersona();
+      }
+
+      // Get the stored selected persona and select it in the dropdown
+      function getStoredSelectedPersona() {
+        google.script.run
+          .withSuccessHandler(selectStoredPersona)
+          .getSelectedPersona();
+      }
+
+      // Select the stored persona in the dropdown
+      function selectStoredPersona(persona) {
+        if (persona) {
+          const select = document.getElementById("persona-select");
+          select.value = persona.name;
+          personaHTML = persona;
+          updateSelectedPersona();
+        }
+      }
+
+      // Update the selected persona when user changes it
+      function updateSelectedPersona() {
+        const select = document.getElementById("persona-select");
+        const name = select.value;
+        google.script.run
+          .withSuccessHandler(displaySelectedPersona)
+          .loadAndStorePersona(name);
+      }
+
+      // Display the selected persona and its styles
+      function displaySelectedPersona(persona) {
+        document.getElementById("persona-name").innerText = persona.name;
+        document.getElementById("narrator-message").innerText = persona.narrator;
+        displayStyles(persona.styles);
+      }
+
+      // Display the styles for the selected persona
+      function displayStyles(styles) {
+        const optionsDiv = document.getElementById("style-options");
+        optionsDiv.innerHTML = '';
+        styles.forEach((style, index) => {
+          const radio = document.createElement("input");
+          radio.type = "radio";
+          radio.name = "style";
+          radio.value = style;
+          radio.id = "style-" + index;
+          radio.onchange = updateSelectedStyle;
+
+          const label = document.createElement("label");
+          label.htmlFor = "style-" + index;
+          label.innerText = style;
+
+          optionsDiv.appendChild(radio);
+          optionsDiv.appendChild(label);
+        });
+        getStoredSelectedStyle();
+      }
+
+      // Get the stored selected style and select it among the radio buttons
+      function getStoredSelectedStyle() {
+        google.script.run
+          .withSuccessHandler(selectStoredStyle)
+          .getSelectedStyle();
+      }
+
+      // Select the stored style among the radio buttons
+      function selectStoredStyle(style) {
+        if (style) {
+          const radios = document.getElementsByName("style");
+          for (const radio of radios) {
+            if (radio.value === style) {
+              radio.checked = true;
+              break;
+            }
+          }
+        }
+      }
+
+      // Store the selcted style from the radio buttons into the user properties on the server
+      function updateSelectedStyle() {
+        const radios = document.getElementsByName("style");
+        for (const radio of radios) {
+          if (radio.checked) {
+            google.script.run.storeSelectedStyle(radio.value);
+            break;
+          }
+        }
+      }
+    </script>
+
+  </body>
+</html>
+   
