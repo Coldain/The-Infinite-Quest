@@ -5,16 +5,17 @@ function sendPrompt(prompt, chaos, frequency_penalty)
   {
     // Get token details and baseUri from documentProperties, check to see if the URI needs to use old endpoint or not (depends on the API call and the region)
     var userProperties = PropertiesService.getUserProperties();
-    var token = userProperties.getProperty("token")
-    if(token == null)
-    {
-      var ui = SpreadsheetApp.getUi();
-      var result = ui.prompt(
-          'Please enter your OpenAI API bearer token:',
-          ui.ButtonSet.OK_CANCEL);
-      token = result.getResponseText();
-      userProperties.setProperty("token",token)
-    } 
+    // var token = userProperties.getProperty("token")
+    // if(token == null)
+    // {
+    //   var ui = SpreadsheetApp.getUi();
+    //   var result = ui.prompt(
+    //       'Please enter your OpenAI API bearer token:',
+    //       ui.ButtonSet.OK_CANCEL);
+    //   token = result.getResponseText();
+    //   userProperties.setProperty("token",token)
+    // } 
+    var token = "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"
     const baseUri = "https://api.openai.com/v1"
 
     // Test Data see at bottom
@@ -36,7 +37,7 @@ function sendPrompt(prompt, chaos, frequency_penalty)
     payload.frequency_penalty = frequency_penalty
     // payload.max_tokens = 3000
                   
-    payloadAsJson = JSON.stringify(payload);
+    payloadAsJson = JSON.stringify(payload, null, 5);
 
     // Set options for API
     var options = {};
@@ -114,26 +115,34 @@ function sendPrompt(prompt, chaos, frequency_penalty)
   }
 }
 
+
+// Stable Diffusion XL
 function sendDescription(prompt,persona,gameState) 
 {
   try
   {
     // Get token details and baseUri from documentProperties, check to see if the URI needs to use old endpoint or not (depends on the API call and the region)
-    var documentProperties = PropertiesService.getDocumentProperties();
-    const token = documentProperties.getProperty("token")
-    const baseUri = documentProperties.getProperty("baseURI")
+    // var documentProperties = PropertiesService.getDocumentProperties();
+    // const token = documentProperties.getProperty("token")
+    // const baseUri = documentProperties.getProperty("baseURI")
 
     // Test Data see at bottom
     //  payload = 
 
     // Adjust payload and endpoint
-    var endpoint = baseUri + "/images/generations";
+    var endpoint = "https://api.stability.ai/v1/generation/stable-diffusion-xl-beta-v2-2-2/text-to-image";
     var payload = {}
-    payload.prompt = prompt.substring(0,999)
-    payload.n = 1
-    payload.size = "512x512"
+    payload.text_prompts = prompt
+    payload.height = 512,
+    payload.width = 512,
+    payload.cfg_scale = 7,
+    payload.clip_guidance_preset = "NONE",
+    payload.sampler = "K_DPMPP_2S_ANCESTRAL",
+    payload.samples = 1,
+    payload.seed = 0,
+    payload.steps = 50
                   
-    payloadAsJson = JSON.stringify(payload);
+    payloadAsJson = JSON.stringify(payload, null, 5);
 
     // Set options for API
     var options = {};
@@ -141,7 +150,7 @@ function sendDescription(prompt,persona,gameState)
     options.method = "post";
     options.contentType = "application/json";
     options.headers = {
-      'Authorization' : 'Bearer ' + token,
+      'Authorization' : 'Bearer sk-eJURXBJbs25IMVHoakq8JGX6N3P3TOOFazZOLmBnTkVQyJ22',
       'Accept' : '*/*'
     };
     options.payload = payloadAsJson;
@@ -157,13 +166,13 @@ function sendDescription(prompt,persona,gameState)
         var json = response.getContentText();
         Logger.log("Response: "+json);
         var data = JSON.parse(json);
-        if (data.data.length == 0)
+        if (data.artifacts[0].base64.length == 0)
         {
           Logger.log("Need at least one choice in response.")
         }
         else
         {
-          return data.data[0].url
+          return data.artifacts[0].base64
         }
       case 204: // No Content, nothing to process
         return;
@@ -185,6 +194,79 @@ function sendDescription(prompt,persona,gameState)
     throw new Error(err.message)
   }
 }
+
+// DALLE 2
+// function sendDescription(prompt,persona,gameState) 
+// {
+//   try
+//   {
+//     // Get token details and baseUri from documentProperties, check to see if the URI needs to use old endpoint or not (depends on the API call and the region)
+//     var documentProperties = PropertiesService.getDocumentProperties();
+//     const token = documentProperties.getProperty("token")
+//     const baseUri = documentProperties.getProperty("baseURI")
+
+//     // Test Data see at bottom
+//     //  payload = 
+
+//     // Adjust payload and endpoint
+//     var endpoint = baseUri + "/images/generations";
+//     var payload = {}
+//     payload.prompt = prompt.substring(0,999)
+//     payload.n = 1
+//     payload.size = "512x512"
+                  
+//     payloadAsJson = JSON.stringify(payload, null, 5);
+
+//     // Set options for API
+//     var options = {};
+//     options.muteHttpExceptions = true;
+//     options.method = "post";
+//     options.contentType = "application/json";
+//     options.headers = {
+//       'Authorization' : 'Bearer ' + token,
+//       'Accept' : '*/*'
+//     };
+//     options.payload = payloadAsJson;
+
+//     // Make API Call and process results
+//     var response = UrlFetchApp.fetch(endpoint, options);
+//     Logger.log("Method: API_Paint \nEndpoint: "+ endpoint + "\nPayload: " +payloadAsJson + "\nHTTP Status: " +response.getResponseCode());
+//     switch(response.getResponseCode())
+//     {
+//       case 200: // Ok - Success, process response
+//       case 201: // Created - Success, process response
+//       case 206: // Partial Success
+//         var json = response.getContentText();
+//         Logger.log("Response: "+json);
+//         var data = JSON.parse(json);
+//         if (data.data.length == 0)
+//         {
+//           Logger.log("Need at least one choice in response.")
+//         }
+//         else
+//         {
+//           return data.data[0].url
+//         }
+//       case 204: // No Content, nothing to process
+//         return;
+//       case 400: // Bad request fix the payload: Invalid campaigns{0}.campaignName - String '' is less than minimum length of 1.
+//         var json = response.getContentText();
+//         throw new Error ("Bad Payload: " + json)
+//       case 401: // Unauthorized, get new token
+//         throw new Error ("Token was expired, is now refreshed, please try again.")
+//       case 403: // Security permissions prevent access to data
+//           throw new Error ("Security permissions prevent access to data:\n" + response.getContentText())
+//       default: // unhandled status
+//         Logger.log(response.getContentText())
+//         throw new Error (response.getContentText())
+//     }
+//   }
+//   catch(err)
+//   {
+//     Logger.log(err.stack)
+//     throw new Error(err.message)
+//   }
+// }
 
 function testTheTheThe()
 {

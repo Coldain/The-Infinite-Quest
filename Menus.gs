@@ -108,7 +108,12 @@ function menuPlay(testing,sytleReview)
   {
     menuStyleSetting()
   }
-  var sheet = spreadsheet.getActiveSheet()
+  // if(testing){
+  //   var sheet = spreadsheet.getSheetByName("Copy of Knights of the Round")
+  // }
+  // else{
+    var sheet = spreadsheet.getActiveSheet()
+  // }
   var sheetName = sheet.getSheetName()
   if (sheetName == "Instructions" || sheetName == "New Game")
   {  
@@ -116,7 +121,7 @@ function menuPlay(testing,sytleReview)
     // spreadsheet.setActiveSheet(spreadsheet.getSheetByName("ImageTest4"), true);
     // sheet = spreadsheet.getSheetByName("ImageTest4")
   }
-  Logger.log("Current Game: " + spreadsheet.getActiveSheet().getSheetName()+"\nMode: "+scriptProperties.getProperty("mode")+ "\nStyle: "+scriptProperties.getProperty("style"))
+  Logger.log("Current Game: " + sheetName +"\nMode: "+scriptProperties.getProperty("mode")+ "\nStyle: "+scriptProperties.getProperty("style"))
   var gameState = getGameState(sheet)
   Logger.log({gameState})
   if (sytleReview == 1)
@@ -215,16 +220,20 @@ function newMenuPlay()
   if(testing != 1){var ui = SpreadsheetApp.getUi();}
   var spreadsheet = SpreadsheetApp.getActive();
   var scriptProperties = PropertiesService.getScriptProperties()
-  if (scriptProperties.getProperty("mode") == null)
-  {
-    menuModeSetting()
-  }
   if (scriptProperties.getProperty("style") == null)
   {
     menuStyleSetting()
   }
-  var sheet = spreadsheet.getActiveSheet()
-  var sheetName = sheet.getSheetName()
+  if (scriptProperties.getProperty("mode") == null)
+  {
+    menuModeSetting()
+    var sheet = spreadsheet.getSheetByName("Copy of Knights of the Round")
+  }
+  else
+  {
+    var sheet = spreadsheet.getActiveSheet()
+    var sheetName = sheet.getSheetName()
+  }
   if (sheetName == "Instructions" || sheetName == "New Game")
   {  
     // Insert UI to select from sheets

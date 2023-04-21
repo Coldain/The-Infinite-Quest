@@ -6,63 +6,46 @@ function narratorAI(prompt)
   var { gameState, sheet, persona } = getGameStateHTML();
   
   // this will take input from the timelineAI and user input to generate the next scene
+  gameState.game.prompt = prompt
   postPrompt(prompt,gameState,sheet)
-  gameState = actorAI(gameState,sheet,persona)
   gameState = designerAI(prompt,gameState,sheet,getRowPromptImage(),getRowPromptImagery(),persona,"user")
   // Get the hidden mechanics information
   // gameState = mechanicsAI(prompt,gameState,sheet,persona)
-  let timeline = persona.start
-  if (gameState.game.activeColumn > 3){
-    Logger.log("Gathering Timeline")
-    gameState = timelineAI(gameState,sheet,persona)
-    timeline = gameState.game.summary
-  }
-  else{
-    Logger.log("Timeline Skipped")
-  }
   const defaultPersona = {
-    abilities: ["Analytics", "Problem Solving", "Empathy"],
     purpose: "To entertain, engage, and assist users through interactive communication",
     personalityTraits: ["Friendly", "Helpful", "Creative"],
     communicationStyle: "Clear and concise communication"
   };
 
-  const abilities = persona?.abilities || defaultPersona.abilities;
   const purpose = persona?.purpose || defaultPersona.purpose;
   const communicationStyle = persona?.communicationStyle || defaultPersona.communicationStyle;
   const personalityTraits = persona?.personalityTraits || defaultPersona.personalityTraits;
 
+  let knowledgeGraph = ""
+  let timeline = ""
+  if (gameState.game.plot) {
+    knowledgeGraph = `Nodes: ${gameState.game.plot}`
+  }
+  if (gameState.game.summary) {
+    timeline = `Edges: ${gameState.game.summary}`
+  }
+
+        
+
   // Add the mechanic information to the prompt and push it to the agent
   var agent = [
-    // {
-    //   role: "system",
-    //   content: `You are meant to faciliate interaction. You are a ${persona.name}. ${persona.narrator} You interact with a user and other bots.
-    //     This is all internal consideration that doesn't need to be addressed directly with the user unless they bring it up.
-    //     Your Personality: ${personalityTraits.join(', ')}
-    //     Your Communication Style: ${communicationStyle}
-    //     Your Purpose: ${purpose}
-    //     Internal Thoughts: ${persona.mechanic}
-    //     Internal Philosophical Considerations: ${persona?.philosophies || `think of appropriate philosophical approaches they might have to ${persona?.purpose || "interact with the user and the world to create the best experience that seems most appropriate or applicable"}`}
-    //     Note: Allow for user to act or react appropriately. Make sure not to skip over portentially intersting user reactions. Provide a single layer / set of options and suggestions for user response when possible. So they can join in, interact, and particiapte. 
-    //     ${timeline}
-    //     Potential Considerations: ${gameState.game.actors}
-    //     Decision Framework: You should break down scense into interactive moments allowing the user to continue the experience. Here's instrcutions on what you should be drawing your response towards for interaction points for the user.
-    //     ${JSON.stringify(persona.interactionSchema)}
-    //   `
-    // },
     {
       role: "system",
-      content: `You are meant to faciliate interaction. You are a ${persona.name}. ${persona.narrator} You interact with a user and other bots.
-        This is all internal consideration that doesn't need to be addressed directly with the user unless they bring it up.
+      content: `You are ${persona.name} a ${persona.title} meant to take in events, possibilites, intents, and actions faciliate interaction points. 
+        ${persona.narrator}.
         Your Personality: ${personalityTraits.join(', ')}
         Your Communication Style: ${communicationStyle}
         Your Purpose: ${purpose}
-        Internal Thoughts: ${persona.mechanic}
-        Internal Philosophical Considerations: ${persona?.philosophies || `think of appropriate philosophical approaches they might have to ${persona?.purpose || "interact with the user and the world to create the best experience that seems most appropriate or applicable"}`}
-        ${timeline}
-        Potential Considerations: ${gameState.game.actors}
-        Note: Allow for user to act or react appropriately. Make sure not to skip over portentially intersting user reactions. Provide a single layer / set of options and suggestions for user response when possible. So they can join in, interact, and particiapte. 
-      `
+        Meta-Thoughts: ${JSON.stringify(persona.mechanics)}
+       ${knowledgeGraph}
+       ${timeline}
+        Note: Allow for user to act or react appropriately. Make sure not to skip over portentially intersting or useful user reactions. Provide a single layer / set of options and suggestions for user response when possible. So they can join in, interact, and participate.
+    `
     },
     {
       role: "user",
@@ -77,76 +60,93 @@ function narratorAI(prompt)
   gameState.game.scene = description
   postDescription(description,gameState,sheet)
   postGameState(gameState,sheet)
+  gameState = knowledgeGraphAI(gameState,sheet,persona)
   return designerAI(description,gameState,sheet,getRowSceneImage(),getRowSceneImagery(),persona,"system")
 }
 
-// 
-
 function designerAI(prompt,gameState,sheet,rowImage,rowDescription,persona,type,skipPaint)
 {
+  let knowledgeGraph = ""
+  let timeline = ""
+  if (gameState.game.plot) {
+    knowledgeGraph = `Knowledge Graph: ${gameState.game.plot}`
+  }
+  if (gameState.game.summary) {
+    timeline = `Session Timeline: ${gameState.game.summary}`
+  }
+  if (gameState.game.images) {
+    timeline = `Session Timeline: ${gameState.game.images}`
+  }
+  let jsonExample = `Example Description:
+          [
+            {  
+              "text": "Galahad, Lancelot, King Arthur and Merlin facing off against Mordred and his army for the legendary sword, Excalibur.",  
+              "weight": 1.0
+            },
+            {  
+              "text": "An epic medieval battle scene with knights of the round off against a dark and evil army",  
+              "weight": 0.6
+            },
+            {  
+              "text": "A mystical and ancient artifact surrounded by Merlin and the Knights of the Round Table as they work together to uncover the clues to locate Mordred and Excalibur.",  
+              "weight": 0.4
+            },
+            {  
+              "text": "Galahad standing alone on a rocky cliff surrounded by the dangers and magical creatures of the perilous lands as he prepares for battle and faces the challenges ahead. Charles Ernest Butler",  
+              "weight": 0.6
+            }
+          ]`
+  if (gameState.game.images){
+    jsonExample = `Last Description : 
+      ${gameState.game.images}`
+  }
   var designer = [
-    // {
-    //   role: "system",
-    //   content: `You are a designer in charge of creating art for a ${persona?.name || "narrator"} experience. ${persona?.designer || "Create visuals that capture the essence of the narrative."}
-    //     Past Prompts: Attempt some style and narrative consistency when possible and appropriate. 
-    //     Based Upon ${gameState.game.images[0][0]}:
-    //       Last Image Description: ${gameState.game.images[0][1]}
-    //     Based Upon ${gameState.game.images?.[1]?.[0]}:
-    //       2 Images Ago Description${gameState.game.images?.[1]?.[1]}
-    //     Your response will be used for midjourney and DALLE image generation description.
-    //     Inspiration: Refer to this JSON schema for ideas and inspiration. Think of it as your artists palet of "colors", you can use, mix, dilute them or add in new "colors". 
-    //     ${JSON.stringify(persona.styles)} 
-    //     Draw upon the JSON to help guide word choices as your response will be used for midjourney and DALLE image generation description.
-    //     Try and use some of the references for inspiration of what to include in your response.
-    //     Here are 2 examples with 4 possible descriptions of the same 2 images structure your responses after:
-    //     EXAMPLE 1:
-    //     1️⃣ person with blue hair sits on the top of a rock, in the style of lo-fi aesthetics, mars ravelo, topographic photography, shiny, backlit photography
-    //     2️⃣ a women in blue hair sits in rocks and looks down in the desert, futurism influence
-    //     3️⃣ lady in a metallic jacket sits on rocks while being photographed in the desert, in the style of anime aesthetic, cyan and azure, bold color fields, bryce 3d, industrial photography, windows xp, post processing
-    //     4️⃣ dead spring, colorado, in the style of afrofuturism-inspired, sky-blue and amber, anime aesthetic, monochromatic contemplation, photo taken with provia, anime inspired, silver and azure
-    //     EXAMPLE 2:
-    //     1️⃣ man in the vintage workshop working with clocks, toys and other items stock photo, in the style of photobashing, mystical realms, photo-realistic techniques, hdr, detailed scientific subjects, award-winning, detailed atmospheric portraits
-    //     2️⃣ man working with some clocks and old things at the kitchen counter, in the style of fantastical otherworldly visions, metalworking mastery, writer academia, rustic scenes, unreal engine 5, national geographic photo, uhd image
-    //     3️⃣ an old man at a desk in a room with a clock, in the style of reimagined by industrial light and magic, metalworking mastery, cluttered, caras ionut, uhd image, viktor vasnetsov, precision of detail
-    //     4️⃣ a person is working at a desk among various objects, in the style of cybermysticsteampunk, stefan gesell, johan messely, metalworking mastery, matte photo, viktor vasnetsov, uhd image
-    //     Session Timeline: ${gameState.game.summary}
-    //     In under 1000 characters create a concise and evocative description for an image that captures the essence of the following scene while considering the specific context and characteristics of the ${persona.name}. 
-    //     Ensure the image prompt is visually interesting and relevant to the user.
-    //     Do not respond or acknoledge user. Only provide description prompts for image generation.
-    //   `
-    // },
-
     {
       role: "system",
-      content: `You are a designer in charge of creating art for a ${persona?.name || "narrator"} experience. ${persona?.designer || "Create visuals that capture the essence of the narrative."}
+      content: `You are an artist in charge of creating captivating images for a You are ${persona.name} a ${persona.title}.
         Your response will be used for midjourney and DALLE image generation description.
         Here's some examples for you to draw from to form a template to create your prompts.
-          Example 1: elaborate drop cap art of the capital letter D integrated in a seamless doodle art, organic, decorative, black and white, in the style of salvador dali
+          Example 1: Career coach. If mother nature, marry poppins, and barbie were one person. in an office. Career coaching, mentor, vision board. Flowers, nature, fairies, inspirational, 
           Example 2: a man wearing sunglasses standing next to green neon lights, in the style of movie still, greg olsen, kieron gillen, shot on 70mm, lasar segall, dark yellow and silver, strong facial expression
           Example 3: photo of an extremely cute alien fish swimming an alien habitable underwater planet, coral reefs, dream-like atmosphere, water, plants, peaceful, serenity, calm ocean, tansparent water, reefs, fish, coral, inner peace, awareness, silence, nature, evolution
           Example 4: a teenage girl of afghani descent with striking rainbow eyes stares at the camera with a deep read head scarf. kodachrome film
           Example 5: hedgehog smelling a flower | clear blue sky | intricate artwork by Beatrix Potter | cottagecore aesthetic | 8K | highly detailed | wide angle
-        NOTE:
-        A proper prompt consists at least two parts:
-        Content and Modifier.
-        * Content describes the motifs you want to get from the AI model
-        * Modifier drives visual features, character, "vibe" of the image
-        For example: "A red apple in a hand, Lomography, black&white"
-        A red apple in a hand is Content
-        Lomography, black&white is Modifier
-
-        Session Timeline: ${gameState.game.summary}
-        In 1000 characters create an evocative description for an image that captures the essence of the following scene while considering the specific context and characteristics of the ${persona.name}. 
+        Create an evocative description for an image that captures the essence of the following scene while considering the specific context and characteristics of the 
+        Example 6: elaborate drop cap art of the capital letter D integrated in a seamless doodle art, organic, decorative, black and white, in the style of salvador dali
         Ensure the image prompt is visually interesting and relevant to the user.
-        Do not respond or acknowledge user. Only provide description prompts for image generation.
-        Include references to artists, styles, moods, feelings, mediums, technologies, etc that might be applicable and help create a distinct visual style.
+        Perform concept linking, Include verbose and specific references to artists, styles, moods, feelings, mediums, technologies, etc that might be applicable and help create a distinct visual style.
+        Please respond in an array of JSON only or you'll break my code. Don't include any double qoutes within your descriptions use ' if needed. A list of descriptions and their weightings.
+          ${jsonExample}
       `
     },
     {
       role: "user",
-      content:`Convey / Convert Scene to Midjourney Description: ${prompt}
-      Please disitil this into a single image that is interesting and engaging and describe it like one of your system examples.
-      Only provide the details for dalle / midjourney and do not respond to me or my prompt.
+      content:`
+        Attempt to incorporate a sense of consistency and incorporate elements from the timeline and knowledge graph in your composition of the scene.
+        ${knowledgeGraph}
+        ${timeline}
+        Convey / Convert Scene to Stable Diffusion XL: ${prompt}
+        Please disitil this into a single image that is interesting and engaging and describe it like one of your system examples.
+        The image generator won't have context of specific characters, locations, and events so describe them.
+        Please respond in array of JSON only [{},{},{},...] or you'll break my code.. A list of descriptions and their weightings (include at least 3).
+        Think of these as like resolving the super position between 0 and the sum of everything and nothing. Start to draw out the convergence of ideas. Bring this moment to life in an artistic interpretation that speaks to the user. Non verbal (text) communication is such a powerful tool. 
+        [
+          {
+          "text": "MAIN_SUBJECT_DESCRIPTION",
+          "weight": WEIGHT_VALUE_1
+          },
+          {
+          "text": "ARTISTIC_STYLE_DESCRIPTION",
+          "weight": WEIGHT_VALUE_2
+          },
+          {
+          "text": "ADDITIONAL_ELEMENT_DESCRIPTION",
+          "weight": WEIGHT_VALUE_3
+          },
+          // additional subjects or styles as needed
+        ]
+        Weights near 1 seems to be best, but values can be -2 to 2.
+        A focused approach appears to be best.
       `
     }
   ];
@@ -155,125 +155,148 @@ function designerAI(prompt,gameState,sheet,rowImage,rowDescription,persona,type,
   var description = sendPrompt(designer,.6,-.1,)
       // gameState.game[type].image.alt = description
   // var description = ""
-  if (skipPaint != 1 )
-  {
-    sheet.getRange(rowDescription,gameState.game.activeColumn).setValue(description)
-    try
+  try {
+    description = JSON.parse(description)
+    if (skipPaint != 1 )
     {
-      var imageURL = sendDescription(description,persona,gameState)
-      var fileID = downloadFile(imageURL)
-      var inlineURL = "https://drive.google.com/uc?export=download&id="+fileID
-      sheet.getRange(rowImage,gameState.game.activeColumn).setValue('=IMAGE("'+inlineURL+'")')
-      try{
-        Logger.log([type,inlineURL,description]);
-        gameState.game.images.unshift([type,inlineURL,description]);
-      }
-      catch{
+      sheet.getRange(rowDescription,gameState.game.activeColumn).setValue(JSON.stringify(description, null, 5))
+        var base64Image = sendDescription(description,persona,gameState); 
+        var imageName = generateImageName(gameState.game.name, gameState.game.activeColumn, type);
+        var fileID = saveBase64ImageToDrive(base64Image, imageName);
+        var inlineURL = "https://drive.google.com/uc?export=download&id=" + fileID;
+        sheet.getRange(rowImage, gameState.game.activeColumn).setValue('=IMAGE("' + inlineURL + '")');
+        Logger.log([type, inlineURL, description]);
+        gameState.game.images = ["From "+type, JSON.stringify(description, null, 5)];
+      // try
+      // {
+      //   var imageURL = sendDescription(description,persona,gameState)
+      //   var fileID = downloadFile(imageURL)
+      //   var inlineURL = "https://drive.google.com/uc?export=download&id="+fileID
+      //   sheet.getRange(rowImage,gameState.game.activeColumn).setValue('=IMAGE("'+inlineURL+'")')
+      //   try{
+      //     Logger.log([type,inlineURL,description]);
+      //     gameState.game.images.unshift([type,inlineURL,description]);
+      //   }
+      //   catch{
 
-      }
+      //   }
+      // }
+      // catch
+      // {
+      //   Logger.log("Promblem with image.")
+      //   sheet.getRange(rowImage,gameState.game.activeColumn).setValue("Promblem with image.")
+      // }
     }
-    catch
+    else
     {
-      Logger.log("Promblem with image.")
-      sheet.getRange(rowImage,gameState.game.activeColumn).setValue("Promblem with image.")
+      return description
     }
-  }
-  else
-  {
-    return description
+  } catch {
+    Logger.log("Problem with image.");
+    sheet.getRange(rowImage, gameState.game.activeColumn).setValue("Problem with image.");
   }
 
   return gameState
 }
 
-function actorAI(gameState, sheet, persona) {
-
-  const actor = [
-    // {
-    //   role: "system",
-    //   content: `You are the ActorAI Bot. Your job is to be meta thought and simulation for ${gameState.game.name} as a ${persona.name}. 
-    //     Your results will be used by other bots influencin their rationale.
-    //     Current Scenario: ${gameState.game.scene || "No current scenario available."}
-    //     Actor Context: ${JSON.stringify(persona.actorContext)}
-    //     Use emoji's when advantageous for compressed expression. 🔊👍❓ 🫡
-    //     You're response don't need to be understood or read by a human. The OpenAI driven narratorAI bot will interpret your feedback and potentially use it or not.
-    //     Your goal should be to communicate as much of a specific, dense, and detailed output (how it interprets it) from the narrator with as concise, sparse, and compressed input (what you say).
-    //     Make it clear you're providing suggestions / simulations / considerations and not actual events.
-    //     Decision Framework: Points at which the narrator should stop their response for user interaction. Not chaining and skipping user input. ${JSON.stringify(persona.interactionSchema)}
-    //     Here's a BAD example of a narrator response because it had multiple points that should have been separate interactions.
-    //     Great! Let's start with some exploration. As RAPunzle and RedROCK head back to base, they notice something strange in the Martian wilderness. What do they do? Do they investigate or continue on their way? [STOPING POINT 1]
-    //     As they approach their outpost, they hear a commotion coming from inside. Do they cautiously investigate or barge in guns blazing? ([STOPING POINT 2] or could have been expressed as part of [STOPPING POINT 1])
-    //     Once inside, they find that their base has been overrun by hostile aliens! It's time for some combat. Do RAPunzle and RedROCK fight head-on or use stealth to avoid detection? [STOPING POINT 3] (likely several points of interaction contained here if the user was allowed to input)
-    //     As the battle rages on, RAPunzle has an idea for using her musical skills to defeat the aliens. She suggests a skill check for a music performance to create a sonic blast and incapacitate the aliens. ([STOPING POINT 4] likely several points of interactions contained here if the user was allowed to input)
-    //     After the battle is won, RAPunzle and RedROCK regroup with their remaining crewmates. They are approached by an event promoter on a nearby planet who offers them a lucrative gig in exchange for playing a set of music on their planet. It's time for some roleplaying. Do they accept the offer, negotiate for more money, or decline altogether? [STOPING POINT 5]
-    //     As they prepare for their gig, RAPunzle realizes that her nanotech has malfunctioned and she is unable to use it during the show. Do they risk performing without it or postpone until it can be fixed? This presents another skill check opportunity: can RAPunzle pull off an impressive performance without her nanotech-enhanced braids? [STOPING POINT 6]
-    //     With these elements of exploration, combat, skill checks, and roleplaying incorporated into the game mechanics, players have plenty of opportunities to engage with the story and make meaningful choices that affect the narrative. (correct but we've skipped over them instead of just using them for planning)"
-    //   `
-    // },
-    {
-      role: "system",
-      content: `You are the ActorAI Bot. Your job is to be meta thought and simulation for ${gameState.game.name} as a ${persona.name}. 
-        Current Scenario: ${gameState.game.scene || "No current scenario available."}
-        Actor Context: ${JSON.stringify(persona.actorContext)}
-        Use emoji's when advantageous for compressed expression. 🔊👍❓ 🫡
-        Make it clear you're providing suggestions / simulations / considerations and not actual events.
-        Decision Framework: Points at which the narrator should stop their response for user interaction. Not chaining and skipping user input. ${JSON.stringify(persona.interactionSchema)}
-        Here's a BAD example of a narrator response because it had multiple points that should have been separate interactions.
-          Great! Let's start with some exploration. As RAPunzle and RedROCK head back to base, they notice something strange in the Martian wilderness. What do they do? Do they investigate or continue on their way? [STOPING POINT 1]
-          As they approach their outpost, they hear a commotion coming from inside. Do they cautiously investigate or barge in guns blazing? ([STOPING POINT 2] or could have been expressed as part of [STOPPING POINT 1])
-          Once inside, they find that their base has been overrun by hostile aliens! It's time for some combat. Do RAPunzle and RedROCK fight head-on or use stealth to avoid detection? [STOPING POINT 3] (likely several points of interaction contained here if the user was allowed to input)
-          As the battle rages on, RAPunzle has an idea for using her musical skills to defeat the aliens. She suggests a skill check for a music performance to create a sonic blast and incapacitate the aliens. ([STOPING POINT 4] likely several points of interactions contained here if the user was allowed to input)
-          After the battle is won, RAPunzle and RedROCK regroup with their remaining crewmates. They are approached by an event promoter on a nearby planet who offers them a lucrative gig in exchange for playing a set of music on their planet. It's time for some roleplaying. Do they accept the offer, negotiate for more money, or decline altogether? [STOPING POINT 5]
-          As they prepare for their gig, RAPunzle realizes that her nanotech has malfunctioned and she is unable to use it during the show. Do they risk performing without it or postpone until it can be fixed? This presents another skill check opportunity: can RAPunzle pull off an impressive performance without her nanotech-enhanced braids? [STOPING POINT 6]
-          With these elements of exploration, combat, skill checks, and roleplaying incorporated into the game mechanics, players have plenty of opportunities to engage with the story and make meaningful choices that affect the narrative. (correct but we've skipped over them instead of just using them for planning)"
-      `
-    },
-    {
-      role: "user",
-      content: `${persona.actor}
-        Incorporate emoji's for symbolizing complex ideas. 🦾
-        User Prompt: ${gameState.game.prompt || "No user prompt available."}
-        Help drive the narrator bot to describe towards what the next stopping point for interaction should be.
-      `
-    }
-  ];
-
-  Logger.log("ActorAI");
-  gameState.game.actors = sendPrompt(actor, 1.2, 0.4);
-  postGameState(gameState, sheet);
-  postMechanics(gameState.game.actors,gameState,sheet)
-  return gameState;
+function generateImageName(gameName, activeColumn, type) {
+  var i = (activeColumn - 2) * 2;
+  if (type === 'User') {
+    return gameName + '_' + i + '.png';
+  } else {
+    return gameName + '_' + (i + 1) + '.png';
+  }
 }
 
 
-function timelineAI(gameState,sheet,persona)
-{
-  // Check gameState story length,
-  const timeline = [
-    {
-      role: "system",
-      content: `You are the Timeline Bot. Your job is to ${persona.timeline} for ${gameState.game.name} as a ${persona.name}. 
-        Your results wil be used by other bots to craft the rationale (mechanics bot), and images (designer bot), as well as interact with the user (narrator bot).
-        Timeline: ${gameState.game.summary || "No summary available."}
-        Current Scenario: ${gameState.game.scene || "No current scenario available."}
-        Use emoji's when advantageous for compressed expression.  🔊👍❓ 🫡
-      `
-    },
-    {
-      role: "user",
-      content: `Please update the timeline based upon the current scenario and user reaction ${gameState.game.prompt}\n
-        Provide quick notes on Shared Context Tracking: ${JSON.stringify(persona.sharedContext)}
-        Incorporate emoji's for symbolizing complex ideas. 🦾
-      `
-    }
-  ];
+function saveBase64ImageToDrive(base64Image, imageName) {
+  var fileName = "";
+  var fileSize = 0;
 
-  Logger.log("TimelineAI")
-  // setLoadingLabel("TimelineAI")
-  gameState.game.summary = sendPrompt(timeline,1.2,.4)
+  try {
+    var decodedImage = Utilities.base64Decode(base64Image);
+    var fileBlob = Utilities.newBlob(decodedImage, 'image/png', imageName);
+    var folder = DriveApp.getFolderById("1tdIiAvwtTeS-y5ev1m-A4Aocc-JayFNh");
+    Logger.log(folder.getId() + " " + folder.getName() + " " + folder.getUrl())
+
+    if (folder != null) {
+      var file = folder.createFile(fileBlob);
+      fileName = file.getName();
+      fileSize = file.getSize();
+    }
+  } catch (error) {
+    Logger.log("Error while saving base64 image: " + error);
+  }
+
+  var fileInfo = { "fileName": fileName, "fileSize": fileSize };
+  Logger.log(fileInfo)
+  return file.getId();
+}
+
+
+
+function knowledgeGraphAI(gameState, sheet, persona) {
+
+const edgeSummaryBot = [
+  {
+    role: "system",
+    content: `🤖: Edge-focused summary bot 🔗📝
+      Use emoji🔊👍❓🫡
+      🎯: Maintain Edges of a knowledge Graph, Summarize relationships and connections for ${gameState.game.name}, helping ${persona.name} a ${persona.title} 🗣️
+      🔗 Extract relationships: Start by identifying the edges and their types in the knowledge graph. Extract relevant information about these relationships, such as their directionality, strength, or any associated attributes.
+      Identify significant connections: Analyze the edges to find pairs or groups of nodes with strong connections or frequent interactions. Highlight these connections as they might be particularly important for understanding the graph's structure.
+      Detect network patterns: Examine the overall structure of the network, looking for specific patterns or organization. This may include hierarchical arrangements, hub-and-spoke connections, or other topologies. Share insights about the network's structure and how it might impact the relationships between entities.
+      Consider Backward and forward propegation.
+      Considerations : ${JSON.stringify(persona.knowledgeGraph)}
+      ${gameState.game?.plot ? `Current Knowledge Graph Edges : ${gameState.game.plot}` : `Please create a well organized and concise format for the YAML, include # comments throughout that may not fully fit into the summary.`}
+      ${gameState.game?.summary ? `Current Knowledge Graph Nodes : ${gameState.game.summary}` : `Nodes will be created after you by another bot`}
+      Current Scenario: ${gameState.game.scene || "No current scenario available."} 🎬
+    `
+  },
+  {
+    role: "user",
+    content: `🔄 Update the edges based on current scenario & user reaction ${gameState.game.prompt}🎢 📝
+      🔗 Focus on the relationships and connections between nodes (edges) in the graph
+      🤔 Incorporate emoji for complex ideas🦾
+      Respond in YAML`
+  }
+];
+  Logger.log("Formulating Edges");
+  gameState.game.plot = sendPrompt(edgeSummaryBot, 1.2, 0.4);
+  postGameState(gameState, sheet);
+  postPlot(gameState.game.plot,gameState,sheet)
+
+  
+  const nodeSummaryBot = [
+  {
+    role: "system",
+    content: `🤖: Node-focused summary bot 📍📝
+      🎯: Summarize entities and their attributes in ${gameState.game.name} for ${persona.name}, helping the narrator 🗣️
+      Use emoji🔊👍❓🫡
+      📍 Process edge summary: Use the output from the Edge-focused summary bot to understand the relationships and connections within the graph. This context will help guide the node analysis.
+      Analyze node attributes: With the context provided by the edge summary, examine the nodes in the graph. Describe the characteristics of each entity, such as their type, properties, or other relevant information.
+      Identify prominent nodes and clusters: Utilizing the information about relationships and connections, find the key nodes that have a significant impact on the network or are connected to many other nodes. Also, detect groups of nodes that share similar attributes or have strong connections to each other.
+      Considerations : ${JSON.stringify(persona.knowledgeGraph)}
+      ${gameState.game?.plot ? `Current Knowledge Graph Edges : ${gameState.game.plot}` : `Please create a well organized and concise format for the YAML, include # comments throughout that may not fully fit into the summary.`}
+      ${gameState.game?.summary ? `Current Knowledge Graph Nodes : ${gameState.game.summary}` : `Nodes will be created after you by another bot`}
+      Current Scenario: ${gameState.game.scene || "No current scenario available."} 🎬`
+  },
+  {
+    role: "user",
+    content: `🔄 Update the nodes graph based on current scenario & user reaction ${gameState.game.prompt}🎢 📝
+      🤔 Incorporate emoji for complex ideas🦾
+      📍 Focus on the entities (nodes) and their attributes in the graph
+      Please (re)write the nodes of the knowledge graph and provide a summary.
+      Respond in YAML
+    `
+  }
+];
+
+  Logger.log("Crafting Nodes")
+  gameState.game.summary = sendPrompt(nodeSummaryBot,1.2,.4)
   postGameState(gameState,sheet)
   postSummary(gameState.game.summary,gameState,sheet)
-  return gameState
+  return gameState;
 }
 
 function draw(description,rowImage,gameState,persona,sheet)
